@@ -32,7 +32,7 @@ function dq_register_post_types() {
 		'rewrite'      => array( 'slug' => 'layanan' ),
 		'menu_icon'    => 'dashicons-welcome-learn-more',
 		'show_in_rest' => true,
-		'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ),
+		'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields' ),
 	) );
 
 	register_post_type( 'package', array(
@@ -50,7 +50,7 @@ function dq_register_post_types() {
 		'rewrite'      => array( 'slug' => 'paket' ),
 		'menu_icon'    => 'dashicons-tag',
 		'show_in_rest' => true,
-		'supports'     => array( 'title', 'editor', 'page-attributes' ),
+		'supports'     => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
 	) );
 
 	register_post_type( 'mentor', array(
@@ -68,7 +68,7 @@ function dq_register_post_types() {
 		'rewrite'      => array( 'slug' => 'mentor' ),
 		'menu_icon'    => 'dashicons-groups',
 		'show_in_rest' => true,
-		'supports'     => array( 'title', 'thumbnail', 'page-attributes' ),
+		'supports'     => array( 'title', 'thumbnail', 'page-attributes', 'custom-fields' ),
 	) );
 
 	register_post_type( 'testimonial', array(
@@ -86,7 +86,7 @@ function dq_register_post_types() {
 		'rewrite'      => array( 'slug' => 'testimoni' ),
 		'menu_icon'    => 'dashicons-format-quote',
 		'show_in_rest' => true,
-		'supports'     => array( 'title', 'editor', 'thumbnail', 'page-attributes' ),
+		'supports'     => array( 'title', 'editor', 'thumbnail', 'page-attributes', 'custom-fields' ),
 	) );
 
 	register_post_type( 'faq', array(
@@ -104,7 +104,7 @@ function dq_register_post_types() {
 		'rewrite'      => array( 'slug' => 'faq' ),
 		'menu_icon'    => 'dashicons-editor-help',
 		'show_in_rest' => true,
-		'supports'     => array( 'title', 'editor', 'page-attributes' ),
+		'supports'     => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
 	) );
 }
 add_action( 'init', 'dq_register_post_types' );
