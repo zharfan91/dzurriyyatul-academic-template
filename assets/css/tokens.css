@@ -27,7 +27,7 @@
 	--color-text-inverse: #ffffff;
 
 	/* Color — structure */
-	--color-border: #e2ddd3;
+	--color-border: rgb(231 229 228 / var(--tw-border-opacity, 1));
 	--color-border-strong: #dcd7cd;
 	--color-error: #ba1a1a;
 	--color-error-bg: #ffdad6;

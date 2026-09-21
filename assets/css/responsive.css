@@ -68,6 +68,8 @@
 /* --- 768px (md / tablet) -------------------------------------------------*/
 @media (min-width: 768px) {
 	.academic-container {
+		padding-top: 5rem;
+    	padding-bottom: 5rem;
 		padding-inline: var(--margin-tablet);
 	}
 
