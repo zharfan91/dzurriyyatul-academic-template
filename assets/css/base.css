@@ -175,6 +175,7 @@ select:focus-visible,
 }
 
 .academic-eyebrow--green {
+	width: fit-content;
 	background: #d1fae5;
 	color: var(--color-primary);
 }
