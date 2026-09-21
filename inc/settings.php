@@ -39,6 +39,17 @@ function dq_settings_schema() {
 		'legal_sk_date'           => 'text',
 		'legal_note'              => 'textarea',
 		'seo_default_description' => 'textarea',
+		'integrity_eyebrow_text'   => 'text',
+		'integrity_heading'        => 'text',
+		'integrity_notice_text'    => 'textarea',
+		'integrity_body'           => 'textarea',
+		'integrity_dont_1'         => 'text',
+		'integrity_dont_2'         => 'text',
+		'integrity_do_1'           => 'text',
+		'integrity_do_2'           => 'text',
+		'integrity_pledge_heading' => 'text',
+		'integrity_pledge_quote'   => 'textarea',
+		'integrity_pledge_badge'   => 'text',
 	);
 }
 
@@ -273,6 +284,23 @@ function dq_render_settings_page() {
 			<h2 class="title"><?php esc_html_e( 'SEO', 'dzurriyyatul-academic' ); ?></h2>
 			<table class="form-table" role="presentation"><tbody>
 				<?php dq_field_row( 'dq_theme_settings[seo_default_description]', __( 'Meta Deskripsi Default', 'dzurriyyatul-academic' ), $flat['seo_default_description'], 'textarea' ); ?>
+			</tbody></table>
+
+			<h2 class="title"><?php esc_html_e( 'Integritas & Etika', 'dzurriyyatul-academic' ); ?></h2>
+			<table class="form-table" role="presentation"><tbody>
+				<?php
+				dq_field_row( 'dq_theme_settings[integrity_eyebrow_text]', __( 'Label Badge (Eyebrow)', 'dzurriyyatul-academic' ), $flat['integrity_eyebrow_text'] );
+				dq_field_row( 'dq_theme_settings[integrity_heading]', __( 'Judul Section', 'dzurriyyatul-academic' ), $flat['integrity_heading'] );
+				dq_field_row( 'dq_theme_settings[integrity_notice_text]', __( 'Teks Peringatan "PENTING"', 'dzurriyyatul-academic' ), $flat['integrity_notice_text'], 'textarea' );
+				dq_field_row( 'dq_theme_settings[integrity_body]', __( 'Paragraf Deskripsi', 'dzurriyyatul-academic' ), $flat['integrity_body'], 'textarea' );
+				dq_field_row( 'dq_theme_settings[integrity_dont_1]', __( 'Poin "TIDAK" 1', 'dzurriyyatul-academic' ), $flat['integrity_dont_1'] );
+				dq_field_row( 'dq_theme_settings[integrity_dont_2]', __( 'Poin "TIDAK" 2', 'dzurriyyatul-academic' ), $flat['integrity_dont_2'] );
+				dq_field_row( 'dq_theme_settings[integrity_do_1]', __( 'Poin "YA" 1', 'dzurriyyatul-academic' ), $flat['integrity_do_1'] );
+				dq_field_row( 'dq_theme_settings[integrity_do_2]', __( 'Poin "YA" 2', 'dzurriyyatul-academic' ), $flat['integrity_do_2'] );
+				dq_field_row( 'dq_theme_settings[integrity_pledge_heading]', __( 'Judul Kartu Pakta', 'dzurriyyatul-academic' ), $flat['integrity_pledge_heading'] );
+				dq_field_row( 'dq_theme_settings[integrity_pledge_quote]', __( 'Kutipan Kartu Pakta', 'dzurriyyatul-academic' ), $flat['integrity_pledge_quote'], 'textarea' );
+				dq_field_row( 'dq_theme_settings[integrity_pledge_badge]', __( 'Teks Badge Pakta', 'dzurriyyatul-academic' ), $flat['integrity_pledge_badge'] );
+				?>
 			</tbody></table>
 
 			<h2 class="title"><?php esc_html_e( 'Hero Slides (3 Slide)', 'dzurriyyatul-academic' ); ?></h2>
