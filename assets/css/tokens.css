@@ -1,0 +1,125 @@
+/**
+ * Design tokens — generated 1:1 from design/DESIGN.md
+ * Do not hard-code any of these literals elsewhere in the theme; reference
+ * the custom property instead so the design system stays a single source
+ * of truth (Master Prompt §6–§11).
+ */
+:root {
+	/* Color — brand anchors */
+	--color-primary: #0c4b33;
+	--color-primary-dark: #093826;
+	--color-secondary: #135d41;
+	--color-gold: #c59b27;
+	--color-gold-light: #e5c158;
+	--color-gold-dark: #9e7b1d;
+
+	/* Color — surfaces */
+	--color-ivory: #fcfbf7;
+	--color-cream: #f5f2ea;
+	--color-background: var(--color-ivory);
+	--color-surface: #ffffff;
+	--color-surface-muted: #f7f5ee;
+	--color-surface-recessed: var(--color-cream);
+
+	/* Color — text */
+	--color-text: #0a2016;
+	--color-text-muted: #5b6e64;
+	--color-text-inverse: #ffffff;
+
+	/* Color — structure */
+	--color-border: #e2ddd3;
+	--color-border-strong: #dcd7cd;
+	--color-error: #ba1a1a;
+	--color-error-bg: #ffdad6;
+	--color-error-text: #93000a;
+
+	/* Color — status pills */
+	--color-status-review-bg: #fef9e7;
+	--color-status-review-border: #f0e1a1;
+	--color-status-review-text: #8d6b0f;
+	--color-status-approved-bg: #ebf5f0;
+	--color-status-approved-border: #c6e7d7;
+	--color-status-approved-text: var(--color-primary);
+
+	/* Typography */
+	--font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
+	--font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+	--text-display-lg-size: 48px;
+	--text-display-lg-line: 56px;
+	--text-display-lg-mobile-size: 32px;
+	--text-display-lg-mobile-line: 40px;
+
+	--text-headline-xl-size: 36px;
+	--text-headline-xl-line: 44px;
+	--text-headline-xl-mobile-size: 26px;
+	--text-headline-xl-mobile-line: 34px;
+
+	--text-headline-lg-size: 28px;
+	--text-headline-lg-line: 36px;
+	--text-headline-md-size: 22px;
+	--text-headline-md-line: 30px;
+	--text-headline-sm-size: 18px;
+	--text-headline-sm-line: 26px;
+
+	--text-body-xl-size: 18px;
+	--text-body-xl-line: 30px;
+	--text-body-lg-size: 16px;
+	--text-body-lg-line: 26px;
+	--text-body-md-size: 14px;
+	--text-body-md-line: 22px;
+	--text-body-sm-size: 12px;
+	--text-body-sm-line: 18px;
+
+	--text-label-lg-size: 14px;
+	--text-label-lg-line: 20px;
+	--text-label-md-size: 12px;
+	--text-label-md-line: 16px;
+	--text-label-caps-size: 11px;
+	--text-label-caps-line: 16px;
+	--text-label-caps-tracking: 0.08em;
+
+	/* Radius */
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 16px;
+	--radius-xl: 24px;
+	--radius-full: 9999px;
+
+	/* Spacing (8px cadence) */
+	--space-xs: 4px;
+	--space-sm: 8px;
+	--space-md: 16px;
+	--space-lg: 24px;
+	--space-xl: 40px;
+	--space-2xl: 64px;
+
+	/* Layout */
+	--container-max: 1280px;
+	--gutter-desktop: 24px;
+	--margin-desktop: 32px;
+	--gutter-tablet: 20px;
+	--margin-tablet: 24px;
+	--gutter-mobile: 16px;
+	--margin-mobile: 16px;
+
+	/* Elevation — Tonal Paper Layering / Archival Ambient Shadows */
+	--shadow-border: 1px solid var(--color-border);
+	--shadow-1: 0 2px 6px -1px rgba(10, 32, 22, 0.04), 0 1px 4px -1px rgba(10, 32, 22, 0.03);
+	--shadow-2: 0 12px 24px -6px rgba(12, 75, 51, 0.08), 0 4px 10px -2px rgba(10, 32, 22, 0.04);
+	--shadow-3: 0 24px 48px -12px rgba(10, 32, 22, 0.16);
+
+	/* Motion */
+	--ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+	--duration-fast: 0.2s;
+	--duration-standard: 0.3s;
+	--duration-slide: 0.6s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--duration-fast: 0.001s;
+		--duration-standard: 0.001s;
+		--duration-slide: 0.001s;
+	}
+}

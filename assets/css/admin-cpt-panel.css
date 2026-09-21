@@ -1,0 +1,40 @@
+.dq-details-field {
+	margin-bottom: 20px;
+}
+
+.dq-details-field:last-child {
+	margin-bottom: 0;
+}
+
+.dq-icon-picker__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 32px);
+	gap: 6px;
+	margin-top: 8px;
+}
+
+.dq-icon-picker__option {
+	width: 32px;
+	height: 32px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	color: #50575e;
+	font-size: 14px;
+	cursor: pointer;
+	padding: 0;
+}
+
+.dq-icon-picker__option:hover {
+	border-color: #0c4b33;
+	color: #0c4b33;
+}
+
+.dq-icon-picker__option.is-selected {
+	border-color: #0c4b33;
+	background: #0c4b33;
+	color: #fff;
+}

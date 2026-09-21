@@ -1,0 +1,224 @@
+/**
+ * Responsive overrides. Breakpoints follow DESIGN.md §9 (mobile <768,
+ * tablet 768-1199, desktop >=1200) with intermediate steps for gradual
+ * scaling; manually verified against 360/390/430/768/1024/1280/1440px
+ * per Master Prompt §43.
+ */
+
+/* --- 480px: small-phone comfort tweaks --------------------------------*/
+@media (min-width: 480px) {
+	.academic-hero__actions {
+		flex-direction: row;
+	}
+
+	.academic-cta__actions {
+		flex-direction: row;
+		justify-content: center;
+	}
+}
+
+/* --- 640px (sm) ---------------------------------------------------------*/
+@media (min-width: 640px) {
+	.academic-nav__cta {
+		display: inline-flex;
+	}
+
+	.academic-hero__arrows--top {
+		display: flex;
+	}
+
+	.academic-hero__footer {
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	.academic-hero__arrows {
+		display: flex;
+	}
+
+	.academic-announcement__row {
+		flex-direction: row;
+		justify-content: space-between;
+		text-align: left;
+	}
+
+	.academic-heading-xl {
+		font-size: var(--text-headline-xl-size);
+		line-height: var(--text-headline-xl-line);
+	}
+
+	.academic-hero__heading {
+		font-size: 2.75rem;
+		line-height: 1.15;
+	}
+
+	.academic-pillars__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.academic-mentors__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.academic-form__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+/* --- 768px (md / tablet) -------------------------------------------------*/
+@media (min-width: 768px) {
+	.academic-container {
+		padding-inline: var(--margin-tablet);
+	}
+
+	.academic-services__header {
+		flex-direction: row;
+		align-items: flex-end;
+		justify-content: space-between;
+	}
+
+	.academic-mentors__header {
+		flex-direction: row;
+		align-items: flex-end;
+		justify-content: space-between;
+	}
+
+	.academic-legality__row {
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.academic-services__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.academic-diagnosis__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.academic-packages__grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.academic-testimonials__grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.academic-footer__grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.academic-footer__bottom {
+		flex-direction: row;
+		justify-content: space-between;
+		text-align: left;
+	}
+
+	.academic-diagnosis__callout,
+	.academic-legality__row {
+		flex-direction: row;
+	}
+}
+
+/* --- 1024px (lg) ----------------------------------------------------------*/
+@media (min-width: 1024px) {
+	.academic-hero__grid {
+		grid-template-columns: repeat(12, 1fr);
+	}
+
+	.academic-hero__content {
+		grid-column: span 7;
+	}
+
+	.academic-hero__visual {
+		grid-column: span 5;
+	}
+
+	.academic-hero__heading {
+		font-size: var(--text-display-lg-size);
+		line-height: var(--text-display-lg-line);
+	}
+
+	.academic-pillars__grid {
+		grid-template-columns: repeat(5, 1fr);
+	}
+
+	.academic-pillars__item {
+		padding-top: 0;
+		border-top: none;
+		padding-inline: var(--space-sm);
+		border-left: 1px solid var(--color-border);
+	}
+
+	.academic-pillars__item:first-child {
+		border-left: none;
+	}
+
+	.academic-services__grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.academic-diagnosis__grid {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	.academic-mentors__grid {
+		grid-template-columns: repeat(4, 1fr);
+	}
+
+	.academic-legality__under {
+		display: inline;
+	}
+
+	.academic-integrity__panel {
+		grid-template-columns: repeat(12, 1fr);
+	}
+
+	.academic-integrity__main {
+		grid-column: span 8;
+	}
+
+	.academic-integrity__pledge {
+		grid-column: span 4;
+	}
+
+	.academic-integrity__checklist {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.academic-footer__grid {
+		grid-template-columns: repeat(12, 1fr);
+	}
+
+	.academic-footer__brand {
+		grid-column: span 4;
+	}
+
+	.academic-footer__col:nth-of-type(2) {
+		grid-column: span 3;
+	}
+
+	.academic-footer__col:nth-of-type(3) {
+		grid-column: span 2;
+	}
+
+	.academic-footer__col:nth-of-type(4) {
+		grid-column: span 3;
+	}
+}
+
+/* --- 1200px+: full desktop grid per DESIGN.md §9 --------------------------*/
+@media (min-width: 1200px) {
+	.academic-container {
+		padding-inline: var(--margin-desktop);
+	}
+
+	.academic-nav__links {
+		display: block;
+	}
+
+	.academic-nav__toggle {
+		display: none;
+	}
+}
