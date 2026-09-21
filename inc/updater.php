@@ -21,6 +21,16 @@ $dq_update_checker = PucFactory::buildUpdateChecker(
 $dq_update_checker->setBranch( 'main' );
 
 /**
+ * Use the zip attached to each GitHub Release instead of GitHub's
+ * auto-generated "zipball" archive. The auto-generated archive has been
+ * unreliable in practice (some hosts fail to unpack it: PclZip
+ * "Invalid archive structure") — a release asset we build and upload
+ * ourselves is a known-good, standard zip. Falls back to the zipball
+ * automatically if a release has no attached .zip asset.
+ */
+$dq_update_checker->getVcsApi()->enableReleaseAssets( '/\.zip$/i' );
+
+/**
  * Let WordPress's background updater apply new releases automatically,
  * instead of waiting for someone to click "Update now" in wp-admin.
  */
