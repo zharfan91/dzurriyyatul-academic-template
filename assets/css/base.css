@@ -165,24 +165,24 @@ select:focus-visible,
 .academic-eyebrow {
 	display: inline-flex;
 	align-items: center;
-	gap: var(--space-xs);
-	font-size: var(--text-label-caps-size);
+	gap: var(--space-sm);
+	font-size: 12px;
 	font-weight: 700;
-	letter-spacing: var(--text-label-caps-tracking);
+	letter-spacing: 0.1em;
 	text-transform: uppercase;
-	padding: var(--space-xs) var(--space-md);
+	padding: var(--space-xs) 12px;
 	border-radius: var(--radius-full);
 }
 
 .academic-eyebrow--green {
-	background: var(--color-surface-recessed);
+	background: #d1fae5;
 	color: var(--color-primary);
 }
 
 .academic-eyebrow--gold {
-	background: #fdf6e3;
-	color: var(--color-gold-dark);
-	border: 1px solid #f0e1a1;
+	background: #fffbeb;
+	color: var(--color-gold);
+	border: 1px solid #fde68a;
 }
 
 .academic-prose :where(p, ul, ol) {
