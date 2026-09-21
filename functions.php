@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Disallow direct access.
 }
 
-define( 'DQ_THEME_VERSION', '1.1.7' );
+define( 'DQ_THEME_VERSION', '1.2.0' );
 define( 'DQ_THEME_DIR', get_template_directory() );
 define( 'DQ_THEME_URI', get_template_directory_uri() );
 
@@ -22,6 +22,7 @@ $dq_includes = array(
 	'/inc/template-functions.php',
 	'/inc/post-types.php',
 	'/inc/settings.php',
+	'/inc/customizer.php',
 	'/inc/consultation-form.php',
 );
 

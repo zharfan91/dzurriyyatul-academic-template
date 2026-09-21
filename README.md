@@ -49,7 +49,7 @@ Tema produksi kustom untuk **DZURRIYYATUL QUR'AN ACADEMIC**, dibangun dari desai
 1. **Salin tema** — copy folder `dzurriyyatul-academic` ke `wp-content/themes/` pada instalasi WordPress Anda.
 2. **Aktivasi** — buka **Appearance → Themes**, lalu aktifkan **Dzurriyyatul Qur'an Academic**. Proses aktivasi otomatis menjalankan *flush rewrite rules*, sehingga permalink `/layanan/` dan `/paket/` langsung berfungsi tanpa langkah tambahan.
 3. **Identitas Situs** — buka **Appearance → Customize → Site Identity**, lalu atur Judul Situs, Tagline, Logo, dan Site Icon (favicon). Bagian ini memakai Customizer bawaan WordPress, bukan pengaturan duplikat milik tema.
-4. **Pengaturan Akademik** — buka **Settings → Pengaturan Akademik**, lalu lengkapi:
+4. **Pengaturan Akademik** — buka **Appearance → Customize → Pengaturan Situs Akademik**, lalu lengkapi:
    - Nomor WhatsApp + pesan default
    - Email, telepon, alamat, dan jam operasional
    - Tautan media sosial (Instagram, Facebook, TikTok, YouTube, Google Maps)
@@ -66,7 +66,7 @@ Tema produksi kustom untuk **DZURRIYYATUL QUR'AN ACADEMIC**, dibangun dari desai
 Sebelum situs tayang (go-live), pastikan:
 
 - [ ] Konten asli sudah ditambahkan di **Layanan**, **Paket**, **Mentor**, **Testimoni**, dan **FAQ** (semuanya kosong saat tema pertama kali diaktifkan).
-- [ ] Semua kolom di **Settings → Pengaturan Akademik** sudah terisi, termasuk ketiga slide hero.
+- [ ] Semua kolom di **Appearance → Customize → Pengaturan Situs Akademik** sudah terisi, termasuk ketiga slide hero.
 - [ ] Nomor WhatsApp dan informasi legalitas/AHU sudah diverifikasi langsung dengan pemilik situs sebelum dipublikasikan.
 - [ ] Foto asli (visual hero, foto mentor, logo) sudah diunggah lewat Media Library — tidak ada gambar yang di-*hotlink* dari CDN placeholder.
 
@@ -76,14 +76,14 @@ Sebelum situs tayang (go-live), pastikan:
 
 | Konten | Lokasi | Catatan |
 |---|---|---|
-| Slide Hero (3) | Settings → Pengaturan Akademik | Setiap slide punya judul, tag, CTA, gambar, kutipan, dan metrik sendiri |
+| Slide Hero (3) | Appearance → Customize → Hero Slides | Setiap slide punya judul, tag, CTA, gambar, kutipan, dan metrik sendiri |
 | Layanan | CPT **Layanan** | Urutan lewat kolom bawaan "Order" (*page-attributes*); tandai unggulan lewat centang di "Detail Layanan" |
 | Paket | CPT **Paket** | Harga berupa angka biasa; tema otomatis memformatnya ke format Rupiah |
 | Mentor | CPT **Mentor** | Gambar unggulan = foto mentor; kredensial = satu badge per baris |
 | Testimoni | CPT **Testimoni** | Rating 1–5; kolom konten = isi kutipan testimoni |
 | FAQ | CPT **FAQ** | Kolom konten = isi jawaban; tampil sebagai accordion yang aksesibel |
 | Artikel | Pos WordPress standar | Memakai `archive.php` / `single.php` |
-| Legal/kontak/sosial | Settings → Pengaturan Akademik | Menyuplai announcement bar, banner legalitas, dan footer |
+| Legal/kontak/sosial | Appearance → Customize → Pengaturan Situs Akademik | Menyuplai announcement bar, banner legalitas, dan footer |
 | Logo/Favicon/Judul situs | Appearance → Customize → Site Identity | Bawaan WordPress, tidak diduplikasi |
 
 Kelima custom post type mendukung kotak **Order** bawaan WordPress yang bisa diurutkan lewat drag-and-drop (via `page-attributes`), sehingga tidak diperlukan antarmuka pengurutan khusus.

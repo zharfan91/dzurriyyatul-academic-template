@@ -24,7 +24,7 @@ for ( $i = 0; $i < 3; $i++ ) {
 if ( empty( $slides ) ) {
 	if ( current_user_can( 'edit_theme_options' ) ) {
 		echo '<section class="academic-hero academic-hero--empty" id="beranda"><div class="academic-container">';
-		dq_empty_state( __( 'Hero belum dikonfigurasi. Buka Pengaturan → Pengaturan Akademik untuk mengisi 3 slide hero.', 'dzurriyyatul-academic' ) );
+		dq_empty_state( __( 'Hero belum dikonfigurasi. Buka Penyesuai (Customize) → Hero Slides untuk mengisi 3 slide hero.', 'dzurriyyatul-academic' ) );
 		echo '</div></section>';
 		return;
 	}
