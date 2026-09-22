@@ -68,8 +68,8 @@
 /* --- 768px (md / tablet) -------------------------------------------------*/
 @media (min-width: 768px) {
 	.academic-container {
-		padding-top: 5rem;
-    	padding-bottom: 5rem;
+		/* padding-top: 5rem;
+    	padding-bottom: 5rem; */
 		padding-inline: var(--margin-tablet);
 	}
 
@@ -84,6 +84,22 @@
 	.academic-nav__row {
 		padding-top: var(--space-sm);
 		padding-bottom: var(--space-sm);
+	}
+
+	/* Same exemption for layout elements that also reuse .academic-container
+	   for width/inline-padding — none of these want the 5rem block padding
+	   above; they manage their own spacing via the section that wraps them. */
+	.academic-hero__tabbar,
+	.academic-hero__grid,
+	.academic-pillars__grid,
+	.academic-legality__row {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	.academic-hero__footer {
+		padding-top: var(--space-sm);
+		padding-bottom: var(--space-lg);
 	}
 
 	.academic-services__header {
