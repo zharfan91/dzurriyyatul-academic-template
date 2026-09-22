@@ -1005,7 +1005,7 @@
 	flex-direction: column;
 	justify-content: space-between;
 	position: relative;
-	background: var(--color-surface-recessed);
+	background: #e9e9e996;
 }
 
 .academic-package-card__ribbon {
