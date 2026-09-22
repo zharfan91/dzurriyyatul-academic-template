@@ -73,6 +73,19 @@
 		padding-inline: var(--margin-tablet);
 	}
 
+	/* Header rows use .academic-container for width/inline-padding only —
+	   exempt them from the vertical padding above so the announcement bar
+	   and nav keep their own compact spacing. */
+	.academic-announcement__row {
+		padding-top: 0;
+		padding-bottom: 0;
+	}
+
+	.academic-nav__row {
+		padding-top: var(--space-sm);
+		padding-bottom: var(--space-sm);
+	}
+
 	.academic-services__header {
 		flex-direction: row;
 		align-items: flex-end;
