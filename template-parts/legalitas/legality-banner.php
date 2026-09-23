@@ -10,9 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$entity_name = dq_get_setting( 'legal_entity_name' );
-$ahu_number  = dq_get_setting( 'legal_ahu_number' );
-$sk_date     = dq_get_setting( 'legal_sk_date' );
+$entity_name    = dq_get_setting( 'legal_entity_name' );
+$ahu_number     = dq_get_setting( 'legal_ahu_number' );
+$sk_date        = dq_get_setting( 'legal_sk_date' );
+$about_page_url = dq_get_setting( 'about_page_url' );
 
 if ( '' === $entity_name && '' === $ahu_number ) {
 	return;
@@ -41,10 +42,12 @@ if ( '' === $entity_name && '' === $ahu_number ) {
 			<?php if ( '' !== $entity_name ) : ?>
 				<span class="academic-legality__under"><?php printf( esc_html__( 'Di bawah naungan %s', 'dzurriyyatul-academic' ), esc_html( $entity_name ) ); ?></span>
 			<?php endif; ?>
-			<a class="academic-legality__cta" href="#legalitas">
-				<span><?php esc_html_e( 'Lihat Legalitas', 'dzurriyyatul-academic' ); ?></span>
-				<?php echo dq_icon( 'fa-solid fa-arrow-up-right-from-square' ); ?>
-			</a>
+			<?php if ( '' !== $about_page_url ) : ?>
+				<a class="academic-legality__cta" href="<?php echo esc_url( $about_page_url ); ?>">
+					<span><?php esc_html_e( 'Lihat Legalitas', 'dzurriyyatul-academic' ); ?></span>
+					<?php echo dq_icon( 'fa-solid fa-arrow-up-right-from-square' ); ?>
+				</a>
+			<?php endif; ?>
 		</div>
 	</div>
 </section>

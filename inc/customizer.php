@@ -323,6 +323,19 @@ function dq_customize_register( $wp_customize ) {
 		'type'    => 'textarea',
 	) );
 
+	$wp_customize->add_setting( 'dq_theme_settings[about_page_url]', array(
+		'type'              => 'option',
+		'default'           => '',
+		'sanitize_callback' => 'dq_customize_sanitize_url',
+		'transport'         => 'refresh',
+	) );
+	$wp_customize->add_control( 'dq_theme_settings[about_page_url]', array(
+		'label'       => __( 'URL Halaman Tentang Kami', 'dzurriyyatul-academic' ),
+		'description' => __( 'Isi setelah membuat halaman "Tentang Kami" di Pages → Add New (gunakan Template "Tentang Kami"). Kosongkan untuk menyembunyikan tombol "Lihat Legalitas" di banner legalitas homepage.', 'dzurriyyatul-academic' ),
+		'section'     => 'dq_section_legal',
+		'type'        => 'url',
+	) );
+
 	/**
 	 * =========================================================================
 	 * Section: SEO (dq_section_seo)

@@ -44,6 +44,7 @@ function dq_settings_schema() {
 		'legal_ahu_number'        => 'text',
 		'legal_sk_date'           => 'text',
 		'legal_note'              => 'textarea',
+		'about_page_url'          => 'url',
 		'seo_default_description' => 'textarea',
 		'integrity_eyebrow_text'   => 'text',
 		'integrity_heading'        => 'text',

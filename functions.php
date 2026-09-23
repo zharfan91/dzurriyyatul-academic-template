@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Disallow direct access.
 }
 
-define( 'DQ_THEME_VERSION', '1.4.1' );
+define( 'DQ_THEME_VERSION', '1.5.0' );
 define( 'DQ_THEME_DIR', get_template_directory() );
 define( 'DQ_THEME_URI', get_template_directory_uri() );
 
