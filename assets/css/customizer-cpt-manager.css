@@ -1,0 +1,135 @@
+.dq-cpt-repeater {
+	margin-top: 8px;
+}
+
+.dq-cpt-repeater__loading {
+	color: #757575;
+	font-style: italic;
+}
+
+.dq-cpt-repeater__error {
+	background: #fcf0f1;
+	border-left: 4px solid #d63638;
+	padding: 8px 12px;
+	margin-bottom: 12px;
+	font-size: 13px;
+}
+
+.dq-cpt-repeater__empty {
+	color: #757575;
+	font-style: italic;
+	margin-bottom: 12px;
+}
+
+.dq-cpt-repeater__list {
+	margin: 0 0 12px;
+	padding: 0;
+	list-style: none;
+}
+
+.dq-cpt-repeater__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	margin-bottom: 6px;
+	background: #fff;
+}
+
+.dq-cpt-repeater__item-title {
+	flex: 1;
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.dq-cpt-repeater__item-status {
+	font-size: 11px;
+	text-transform: uppercase;
+	background: #f0f0f1;
+	color: #50575e;
+	padding: 2px 6px;
+	border-radius: 3px;
+	flex-shrink: 0;
+}
+
+.dq-cpt-repeater__item-actions {
+	display: flex;
+	gap: 2px;
+	flex-shrink: 0;
+}
+
+.dq-cpt-repeater__add {
+	width: 100%;
+	justify-content: center;
+}
+
+.dq-cpt-repeater__editor {
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 12px;
+	background: #fff;
+}
+
+.dq-cpt-repeater__field {
+	margin-bottom: 14px;
+}
+
+.dq-cpt-repeater__field:last-of-type {
+	margin-bottom: 0;
+}
+
+.dq-cpt-repeater__editor-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 16px;
+	padding-top: 12px;
+	border-top: 1px solid #dcdcde;
+}
+
+.dq-icon-picker__grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 4px;
+	margin-top: 8px;
+}
+
+.dq-icon-picker__option {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+}
+
+.dq-icon-picker__option:hover {
+	background: #f0f0f1;
+}
+
+.dq-icon-picker__option.is-selected {
+	background: #00a32a;
+	border-color: #00a32a;
+	color: #fff;
+}
+
+.dq-media-picker__preview {
+	display: block;
+	max-width: 100%;
+	height: auto;
+	border-radius: 4px;
+	margin-bottom: 8px;
+	border: 1px solid #dcdcde;
+}
+
+.dq-media-picker__actions {
+	display: flex;
+	gap: 6px;
+}
