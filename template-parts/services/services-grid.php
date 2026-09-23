@@ -54,6 +54,10 @@ if ( ! $services_query->have_posts() ) {
 		<div class="academic-services__grid">
 			<?php while ( $services_query->have_posts() ) : $services_query->the_post(); ?>
 				<?php
+				global $post;
+				$post = dq_maybe_preview_post( $post );
+				setup_postdata( $post );
+
 				$icon      = get_post_meta( get_the_ID(), '_dq_icon', true );
 				$short     = get_post_meta( get_the_ID(), '_dq_short_description', true );
 				$features  = dq_lines_to_array( get_post_meta( get_the_ID(), '_dq_features', true ) );
@@ -64,7 +68,7 @@ if ( ! $services_query->have_posts() ) {
 						<div class="academic-service-card__icon"><?php echo dq_icon( $icon ); ?></div>
 					<?php endif; ?>
 					<h3 class="academic-heading-md">
-						<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+						<a href="<?php echo esc_url( get_permalink( $post->post_parent ? $post->post_parent : get_the_ID() ) ); ?>"><?php the_title(); ?></a>
 					</h3>
 					<p class="academic-service-card__desc">
 						<?php echo esc_html( '' !== $short ? $short : wp_trim_words( get_the_excerpt(), 24 ) ); ?>

@@ -43,6 +43,10 @@ if ( ! $packages_query->have_posts() ) {
 			<div class="academic-packages__grid">
 				<?php while ( $packages_query->have_posts() ) : $packages_query->the_post(); ?>
 					<?php
+					global $post;
+					$post = dq_maybe_preview_post( $post );
+					setup_postdata( $post );
+
 					$price       = get_post_meta( get_the_ID(), '_dq_price', true );
 					$price_label = get_post_meta( get_the_ID(), '_dq_price_label', true );
 					$billing     = get_post_meta( get_the_ID(), '_dq_billing_type', true );

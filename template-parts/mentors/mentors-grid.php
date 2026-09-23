@@ -44,6 +44,10 @@ if ( ! $mentors_query->have_posts() ) {
 		<div class="academic-mentors__grid">
 				<?php while ( $mentors_query->have_posts() ) : $mentors_query->the_post(); ?>
 					<?php
+					global $post;
+					$post = dq_maybe_preview_post( $post );
+					setup_postdata( $post );
+
 					$role      = get_post_meta( get_the_ID(), '_dq_role', true );
 					$specialty = get_post_meta( get_the_ID(), '_dq_specialization', true );
 					$badges    = dq_lines_to_array( get_post_meta( get_the_ID(), '_dq_credentials', true ) );

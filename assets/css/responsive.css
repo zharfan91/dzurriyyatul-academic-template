@@ -68,8 +68,8 @@
 /* --- 768px (md / tablet) -------------------------------------------------*/
 @media (min-width: 768px) {
 	.academic-container {
-		/* padding-top: 5rem;
-    	padding-bottom: 5rem; */
+		padding-top: 2rem;
+    	padding-bottom: 2rem;
 		padding-inline: var(--margin-tablet);
 	}
 
@@ -85,7 +85,6 @@
 		padding-top: var(--space-sm);
 		padding-bottom: var(--space-sm);
 	}
-
 	/* Same exemption for layout elements that also reuse .academic-container
 	   for width/inline-padding — none of these want the 5rem block padding
 	   above; they manage their own spacing via the section that wraps them. */

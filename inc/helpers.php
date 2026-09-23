@@ -200,3 +200,44 @@ function dq_strip_leading_dash( $text ) {
 	$text = trim( (string) $text );
 	return trim( (string) preg_replace( '/^[-–—\x{2013}\x{2014}]+\s*/u', '', $text ) );
 }
+
+/**
+ * Inside a CPT grid loop, swap $post for its current autosave/revision when
+ * we're rendering a WordPress "Preview" request for that exact post — so an
+ * admin previewing unsaved edits (icon, price, features, etc. — all post
+ * meta, revisioned via the _wp_post_revision_meta_keys filter in
+ * inc/post-types.php) sees them reflected in the card, not the last-saved
+ * version. Every other post in the same loop is returned untouched.
+ *
+ * Verifies the preview nonce and edit capability itself rather than relying
+ * on is_preview() alone, since this runs inside a secondary WP_Query the
+ * core preview-access check was never written for.
+ *
+ * @param WP_Post $post Current post in the loop (already the_post()'d).
+ * @return WP_Post
+ */
+function dq_maybe_preview_post( $post ) {
+	if ( empty( $_GET['preview'] ) || empty( $_GET['preview_id'] ) || empty( $_GET['preview_nonce'] ) ) {
+		return $post;
+	}
+
+	$preview_id = absint( $_GET['preview_id'] );
+
+	if ( $preview_id !== (int) $post->ID ) {
+		return $post;
+	}
+
+	$nonce = sanitize_text_field( wp_unslash( $_GET['preview_nonce'] ) );
+
+	if ( ! wp_verify_nonce( $nonce, 'post_preview_' . $preview_id ) ) {
+		return $post;
+	}
+
+	if ( ! current_user_can( 'edit_post', $preview_id ) ) {
+		return $post;
+	}
+
+	$autosave = wp_get_post_autosave( $preview_id );
+
+	return ( $autosave instanceof WP_Post ) ? $autosave : $post;
+}

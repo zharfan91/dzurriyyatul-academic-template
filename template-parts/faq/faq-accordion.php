@@ -42,7 +42,14 @@ if ( ! $faq_query->have_posts() ) {
 
 		<div class="academic-accordion" data-academic-accordion>
 			<?php $i = 0; while ( $faq_query->have_posts() ) : $faq_query->the_post(); $i++; ?>
-				<?php $panel_id = 'faq-panel-' . get_the_ID(); $button_id = 'faq-button-' . get_the_ID(); ?>
+				<?php
+				global $post;
+				$post = dq_maybe_preview_post( $post );
+				setup_postdata( $post );
+
+				$panel_id = 'faq-panel-' . get_the_ID();
+				$button_id = 'faq-button-' . get_the_ID();
+				?>
 				<div class="academic-accordion__item">
 					<h3 class="academic-accordion__heading">
 						<button

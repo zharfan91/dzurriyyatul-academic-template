@@ -243,6 +243,29 @@ function dq_register_cpt_meta() {
 add_action( 'init', 'dq_register_cpt_meta' );
 
 /**
+ * Include every CPT's meta fields (icon, price, features, etc.) plus the
+ * featured image in post revisions/autosaves, so the "Preview di Situs"
+ * link (js/admin-cpt-panel.js + dq_maybe_preview_post() in inc/helpers.php)
+ * actually reflects unsaved changes instead of the last-published values —
+ * none of this is revisioned by default.
+ *
+ * @param string[] $keys Meta keys already marked for revisioning.
+ * @param WP_Post  $post Post being revisioned.
+ * @return string[]
+ */
+function dq_add_cpt_meta_to_revisions( $keys, $post ) {
+	$schema = dq_cpt_meta_schema();
+
+	if ( isset( $schema[ $post->post_type ] ) ) {
+		$keys[] = '_thumbnail_id';
+		$keys   = array_merge( $keys, array_keys( $schema[ $post->post_type ] ) );
+	}
+
+	return $keys;
+}
+add_filter( '_wp_post_revision_meta_keys', 'dq_add_cpt_meta_to_revisions', 10, 2 );
+
+/**
  * Load the native sidebar panel (Gutenberg PluginDocumentSettingPanel) on
  * the 5 custom post types' add/edit screens only. Replaces the old classic
  * meta box entirely — the panel reads/writes meta via register_post_meta()
@@ -278,12 +301,26 @@ function dq_enqueue_cpt_panel_assets( $hook ) {
 		'faq'         => __( 'Detail FAQ', 'dzurriyyatul-academic' ),
 	);
 
+	// Homepage anchor per post type, for the "Preview on site" link. Only
+	// the 4 types with a real homepage section get one — testimonial's
+	// section has no #anchor to jump to. The link itself is built in JS
+	// from the editor's own (reactive, autosave-aware) preview link,
+	// re-targeted at this anchor — see js/admin-cpt-panel.js.
+	$preview_anchors = array(
+		'service' => 'layanan',
+		'package' => 'paket',
+		'mentor'  => 'mentor',
+		'faq'     => 'faq',
+	);
+
 	wp_add_inline_script(
 		'dq-admin-cpt-panel',
 		'window.dqCptPanel = ' . wp_json_encode( array(
-			'schema' => $schema,
-			'icons'  => dq_icon_picker_options(),
-			'labels' => $labels,
+			'schema'         => $schema,
+			'icons'          => dq_icon_picker_options(),
+			'labels'         => $labels,
+			'previewAnchors' => $preview_anchors,
+			'homeUrl'        => home_url( '/' ),
 		) ) . ';',
 		'before'
 	);

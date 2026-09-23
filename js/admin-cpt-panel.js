@@ -23,6 +23,29 @@
 	var SCHEMA = CONFIG.schema || {};
 	var ICONS = CONFIG.icons || {};
 	var LABELS = CONFIG.labels || {};
+	var PREVIEW_ANCHORS = CONFIG.previewAnchors || {};
+	var HOME_URL = CONFIG.homeUrl || '/';
+	var __ = ( wp.i18n && wp.i18n.__ ) || function ( text ) { return text; };
+
+	/**
+	 * Re-target WordPress' own (autosave-aware) post preview link at a
+	 * homepage section anchor instead of the post's single-item permalink,
+	 * keeping its preview_id/preview_nonce query args intact so
+	 * dq_maybe_preview_post() (inc/helpers.php) can substitute the
+	 * autosave's content into that one card server-side.
+	 *
+	 * @param {string} previewLink Value of core/editor's getEditedPostPreviewLink().
+	 * @param {string} anchor      Homepage section id, e.g. "layanan".
+	 * @return {string} Empty string if there's nothing to link to yet.
+	 */
+	function buildSitePreviewUrl( previewLink, anchor ) {
+		if ( ! previewLink || ! anchor ) {
+			return '';
+		}
+		var queryIndex = previewLink.indexOf( '?' );
+		var queryString = queryIndex !== -1 ? previewLink.slice( queryIndex ) : '';
+		return HOME_URL + '#' + anchor + queryString;
+	}
 
 	function IconPickerField( props ) {
 		var value = props.value;
@@ -130,6 +153,12 @@
 			return select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
 		}, [] );
 
+		// Reactive: updates automatically as WordPress' own autosave cycle
+		// refreshes the current preview link while the admin keeps editing.
+		var previewLink = useSelect( function ( select ) {
+			return select( 'core/editor' ).getEditedPostPreviewLink();
+		}, [] );
+
 		var editPost = useDispatch( 'core/editor' ).editPost;
 
 		if ( ! fields ) {
@@ -142,13 +171,30 @@
 			editPost( { meta: next } );
 		}
 
-		return el(
-			PluginDocumentSettingPanel,
-			{
-				name: 'dq-details-panel',
-				title: LABELS[ postType ] || 'Detail',
-				className: 'dq-details-panel',
-			},
+		var PREVIEW_URL = buildSitePreviewUrl( previewLink, PREVIEW_ANCHORS[ postType ] );
+
+		var children = [];
+
+		if ( PREVIEW_URL ) {
+			children.push(
+				el(
+					'div',
+					{ key: 'dq-preview-link', className: 'dq-details-field dq-details-preview' },
+					el(
+						components.Button,
+						{
+							variant: 'secondary',
+							href: PREVIEW_URL,
+							target: '_blank',
+							rel: 'noopener noreferrer',
+						},
+						__( 'Preview di Situs', 'dzurriyyatul-academic' )
+					)
+				)
+			);
+		}
+
+		children = children.concat(
 			Object.keys( fields ).map( function ( key ) {
 				return el(
 					'div',
@@ -162,6 +208,16 @@
 					} )
 				);
 			} )
+		);
+
+		return el(
+			PluginDocumentSettingPanel,
+			{
+				name: 'dq-details-panel',
+				title: LABELS[ postType ] || 'Detail',
+				className: 'dq-details-panel',
+			},
+			children
 		);
 	}
 
