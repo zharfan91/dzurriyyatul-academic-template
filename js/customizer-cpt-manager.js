@@ -192,6 +192,8 @@
 		var item = props.item;
 		var fields = props.fields;
 		var hasThumbnail = props.hasThumbnail;
+		var hasContent = props.hasContent;
+		var contentLabel = props.contentLabel;
 		var saving = props.saving;
 		var onSave = props.onSave;
 		var onCancel = props.onCancel;
@@ -199,6 +201,10 @@
 		var initialTitle = ( item.title && 'object' === typeof item.title )
 			? ( item.title.raw || item.title.rendered || '' )
 			: ( item.title || '' );
+
+		var initialContent = ( item.content && 'object' === typeof item.content )
+			? ( item.content.raw || '' )
+			: ( item.content || '' );
 
 		var initialImageUrl = '';
 		if ( item._embedded && item._embedded[ 'wp:featuredmedia' ] && item._embedded[ 'wp:featuredmedia' ][ 0 ] ) {
@@ -208,6 +214,10 @@
 		var titleState = useState( initialTitle );
 		var title = titleState[ 0 ];
 		var setTitle = titleState[ 1 ];
+
+		var contentState = useState( initialContent );
+		var content = contentState[ 0 ];
+		var setContent = contentState[ 1 ];
 
 		var metaState = useState( Object.assign( {}, emptyMetaFor( fields ), item.meta || {} ) );
 		var meta = metaState[ 0 ];
@@ -227,6 +237,9 @@
 			var payload = { title: title, meta: meta };
 			if ( hasThumbnail ) {
 				payload.featured_media = image.id || 0;
+			}
+			if ( hasContent ) {
+				payload.content = content;
 			}
 			onSave( payload );
 		}
@@ -253,6 +266,14 @@
 				value: title,
 				onChange: setTitle,
 			} ),
+			hasContent
+				? el( components.TextareaControl, {
+						label: contentLabel || __( 'Konten', 'dzurriyyatul-academic' ),
+						value: content,
+						rows: 5,
+						onChange: setContent,
+				  } )
+				: null,
 			hasThumbnail
 				? el( MediaPicker, {
 						value: image.id,
@@ -282,7 +303,7 @@
 
 	function RepeaterApp( props ) {
 		var postType = props.postType;
-		var typeConfig = TYPES[ postType ] || { label: postType, fields: {}, hasThumbnail: false };
+		var typeConfig = TYPES[ postType ] || { label: postType, fields: {}, hasThumbnail: false, hasContent: false, contentLabel: '' };
 		var fields = typeConfig.fields || {};
 
 		var itemsState = useState( null );
@@ -305,7 +326,7 @@
 			apiFetch( {
 				path: '/wp/v2/' + postType +
 					'?per_page=100&orderby=menu_order&order=asc&status=publish,draft&context=edit' +
-					'&_embed=wp:featuredmedia&_fields=id,title,status,menu_order,meta,featured_media,_links,_embedded',
+					'&_embed=wp:featuredmedia&_fields=id,title,content,status,menu_order,meta,featured_media,_links,_embedded',
 			} )
 				.then( function ( response ) {
 					setItems( response );
@@ -411,6 +432,8 @@
 					item: editingItem,
 					fields: fields,
 					hasThumbnail: typeConfig.hasThumbnail,
+					hasContent: typeConfig.hasContent,
+					contentLabel: typeConfig.contentLabel,
 					saving: saving,
 					onSave: handleSave,
 					onCancel: function () {

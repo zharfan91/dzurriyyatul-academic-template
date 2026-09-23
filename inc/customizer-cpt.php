@@ -1,7 +1,7 @@
 <?php
 /**
- * Customizer-native content management for the 4 unbounded CPT collections
- * (Layanan, Paket, Mentor, FAQ) — a "Kelola Konten" panel where each section
+ * Customizer-native content management for the 5 unbounded CPT collections
+ * (Layanan, Paket, Mentor, Testimoni, FAQ) — a "Kelola Konten" panel where each section
  * is a JS-driven repeater (list + add + edit + delete + reorder) talking
  * directly to the REST API, with its own instant save (not tied to
  * Customizer's Publish button) and its own previewer.refresh() call.
@@ -18,29 +18,48 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The 4 CPTs this panel manages, with their section label and whether they
- * support a featured image (service + mentor do; package + faq don't, per
- * their register_post_type() 'supports' array in inc/post-types.php).
+ * The 5 CPTs this panel manages, with their section label and whether they
+ * support a featured image (service, testimonial + mentor do; package + faq
+ * don't) and whether they support the native "editor" (post_content) field —
+ * every type except mentor displays it front-end (service's excerpt
+ * fallback, package's description, faq's actual answer text, testimonial's
+ * quote itself), so the repeater's item editor needs a content textarea for
+ * those four. Matches each register_post_type() 'supports' array in
+ * inc/post-types.php.
  *
- * @return array<string,array{label:string,has_thumbnail:bool}>
+ * @return array<string,array{label:string,has_thumbnail:bool,has_content:bool,content_label:string}>
  */
 function dq_cpt_manager_types() {
 	return array(
-		'service' => array(
+		'service'     => array(
 			'label'         => __( 'Layanan', 'dzurriyyatul-academic' ),
 			'has_thumbnail' => false,
+			'has_content'   => true,
+			'content_label' => __( 'Deskripsi Lengkap (opsional — dipakai jika Deskripsi Singkat di atas kosong)', 'dzurriyyatul-academic' ),
 		),
-		'package' => array(
+		'package'     => array(
 			'label'         => __( 'Paket', 'dzurriyyatul-academic' ),
 			'has_thumbnail' => false,
+			'has_content'   => true,
+			'content_label' => __( 'Deskripsi Paket', 'dzurriyyatul-academic' ),
 		),
-		'mentor'  => array(
+		'mentor'      => array(
 			'label'         => __( 'Mentor', 'dzurriyyatul-academic' ),
 			'has_thumbnail' => true,
+			'has_content'   => false,
+			'content_label' => '',
 		),
-		'faq'     => array(
+		'testimonial' => array(
+			'label'         => __( 'Testimoni', 'dzurriyyatul-academic' ),
+			'has_thumbnail' => true,
+			'has_content'   => true,
+			'content_label' => __( 'Kutipan Testimoni', 'dzurriyyatul-academic' ),
+		),
+		'faq'         => array(
 			'label'         => __( 'FAQ', 'dzurriyyatul-academic' ),
 			'has_thumbnail' => false,
+			'has_content'   => true,
+			'content_label' => __( 'Jawaban', 'dzurriyyatul-academic' ),
 		),
 	);
 }
@@ -128,6 +147,8 @@ function dq_customize_cpt_manager_enqueue_assets() {
 		$config[ $post_type ] = array(
 			'label'        => $meta['label'],
 			'hasThumbnail' => $meta['has_thumbnail'],
+			'hasContent'   => $meta['has_content'],
+			'contentLabel' => $meta['content_label'],
 			'fields'       => isset( $schema[ $post_type ] ) ? $schema[ $post_type ] : array(),
 		);
 	}
