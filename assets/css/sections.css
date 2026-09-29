@@ -23,23 +23,6 @@
 	grid-template-columns: 1fr min(var(--container-max), 100%) 1fr;
 }
 
-/* Full-bleed tabbar backdrop: a grid row spanning all 3 columns, sized to
-   the tabbar's own height. */
-.academic-hero::before {
-	content: '';
-	grid-row: 1;
-	grid-column: 1 / -1;
-	background: rgba(255, 255, 255, 0.7);
-	backdrop-filter: blur(8px);
-	border-bottom: 1px solid var(--color-border);
-	z-index: 10;
-	pointer-events: none;
-}
-
-.academic-hero--single::before {
-	display: none;
-}
-
 .academic-hero__clip-defs {
 	position: absolute;
 	width: 0;
@@ -56,82 +39,9 @@
 	background-size: 24px 24px;
 }
 
-.academic-hero__tabbar {
-	position: relative;
-	z-index: 20;
-	grid-row: 1;
-	grid-column: 2 / 3;
-	/* Fill grid column 2 instead of .academic-container's auto-centering. */
-	max-width: none;
-	margin-inline: 0;
-	display: flex;
-	align-items: center;
-	padding-block: 10px;
-}
-
-.academic-hero__tabs {
-	display: flex;
-	align-items: center;
-	gap: var(--space-sm);
-	flex: 1 1 auto;
-	min-width: 0;
-	overflow-x: auto;
-	scrollbar-width: none;
-}
-
-.academic-hero__tabs::-webkit-scrollbar {
-	display: none;
-}
-
-.academic-hero__tab {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--space-sm);
-	padding: 8px 16px;
-	border-radius: var(--radius-full);
-	border: 1px solid var(--color-border);
-	background: var(--color-surface);
-	color: var(--color-text-muted);
-	font-family: var(--font-body);
-	font-size: var(--text-body-sm-size);
-	font-weight: 600;
-	transition: all var(--duration-fast) var(--ease-standard);
-	flex-shrink: 0;
-}
-
-.academic-hero__tab:hover {
-	background: var(--color-surface-recessed);
-}
-
-.academic-hero__tab.is-active {
-	border-color: var(--color-primary);
-	background: var(--color-primary);
-	color: var(--color-text-inverse);
-	box-shadow: var(--shadow-1);
-}
-
-.academic-hero__tab-number {
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
-	background: var(--color-surface-recessed);
-	color: var(--color-text-muted);
-	font-size: 10px;
-	font-weight: 700;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-}
-
-.academic-hero__tab.is-active .academic-hero__tab-number {
-	background: rgba(255, 255, 255, 0.25);
-	color: var(--color-text-inverse);
-}
-
 .academic-hero__stage {
 	position: relative;
-	grid-row: 2;
+	grid-row: 1;
 	grid-column: 1 / -1;
 	min-width: 0;
 	outline: none;
@@ -353,7 +263,7 @@
 .academic-hero__footer {
 	position: relative;
 	z-index: 2;
-	grid-row: 3;
+	grid-row: 2;
 	grid-column: 2 / 3;
 	max-width: none;
 	margin-inline: 0;

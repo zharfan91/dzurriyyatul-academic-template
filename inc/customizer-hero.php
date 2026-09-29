@@ -69,7 +69,6 @@ function dq_customize_hero_slide_fields() {
 	return array(
 		__( 'Konten', 'dzurriyyatul-academic' )          => array(
 			'enabled'             => array( 'type' => 'checkbox', 'label' => __( 'Tampilkan slide ini', 'dzurriyyatul-academic' ), 'default' => true ),
-			'tab_label'           => array( 'type' => 'text', 'label' => __( 'Label Navigasi Atas', 'dzurriyyatul-academic' ) ),
 			'badge_emoji'         => array( 'type' => 'text', 'label' => __( 'Emoji Eyebrow (opsional)', 'dzurriyyatul-academic' ) ),
 			'badge_text'          => array( 'type' => 'text', 'label' => __( 'Eyebrow', 'dzurriyyatul-academic' ) ),
 			'heading_line1'       => array( 'type' => 'text', 'label' => __( 'Judul Baris 1', 'dzurriyyatul-academic' ) ),

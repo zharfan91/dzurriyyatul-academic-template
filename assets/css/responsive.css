@@ -75,7 +75,6 @@
 	/* Same exemption for layout elements that also reuse .academic-container
 	   for width/inline-padding — none of these want the 5rem block padding
 	   above; they manage their own spacing via the section that wraps them. */
-	.academic-hero__tabbar,
 	.academic-hero__grid,
 	.academic-pillars__grid,
 	.academic-legality__row {

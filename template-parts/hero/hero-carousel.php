@@ -4,8 +4,8 @@
  *
  * Each slide: 50/50 text + large image that bleeds to the viewport's right
  * edge, with a per-slide abstract left edge (inc/hero-frame.php). Navigation
- * is the top slide tabs + a subtle footer (indicator + previous/next);
- * behavior lives in js/hero.js.
+ * is a subtle footer (indicator + previous/next); behavior lives in
+ * js/hero.js.
  *
  * Older per-slide fields (quote, checklist, caption, tags, metrics) are kept
  * in the saved settings but no longer rendered here.
@@ -68,7 +68,7 @@ $total        = count( $slides );
 $is_carousel  = $total > 1;
 $show_nav     = $is_carousel && $carousel['show_navigation'];
 $show_dots    = $is_carousel && $carousel['show_indicator'];
-$hero_classes = 'academic-hero academic-hero--editorial academic-hero--anim-' . $carousel['animation'] . ( $is_carousel ? '' : ' academic-hero--single' );
+$hero_classes = 'academic-hero academic-hero--editorial academic-hero--anim-' . $carousel['animation'];
 ?>
 <section
 	class="<?php echo esc_attr( $hero_classes ); ?>"
@@ -79,25 +79,6 @@ $hero_classes = 'academic-hero academic-hero--editorial academic-hero--anim-' . 
 >
 	<?php dq_hero_frame_render_clip_paths( $slides ); ?>
 	<div class="academic-hero__pattern" aria-hidden="true"></div>
-
-	<?php if ( $is_carousel ) : ?>
-		<div class="academic-container academic-hero__tabbar">
-			<div class="academic-hero__tabs">
-				<?php $n = 0; foreach ( $slides as $index => $slide ) : ?>
-					<button
-						type="button"
-						class="academic-hero__tab<?php echo 0 === $n ? ' is-active' : ''; ?>"
-						data-slide-index="<?php echo esc_attr( $n ); ?>"
-						aria-controls="hero-slide-<?php echo esc_attr( $index ); ?>"
-						aria-current="<?php echo 0 === $n ? 'true' : 'false'; ?>"
-					>
-						<span class="academic-hero__tab-number"><?php echo esc_html( $n + 1 ); ?></span>
-						<span><?php echo esc_html( '' !== $slide['tab_label'] ? $slide['tab_label'] : $slide['heading_line1'] ); ?></span>
-					</button>
-				<?php $n++; endforeach; ?>
-			</div>
-		</div>
-	<?php endif; ?>
 
 	<div
 		class="academic-hero__stage"

@@ -1,5 +1,5 @@
 /**
- * Hero carousel: slide tabs, dot indicator + counter, previous/next, arrow
+ * Hero carousel: dot indicator + counter, previous/next, arrow
  * keys, touch swipe, autoplay (Customizer → Hero Slides → Pengaturan
  * Carousel) paused on hover/focus, and a prefers-reduced-motion escape hatch.
  *
@@ -29,7 +29,6 @@
 			return;
 		}
 
-		var tabs = Array.prototype.slice.call( hero.querySelectorAll( '.academic-hero__tab' ) );
 		var dots = Array.prototype.slice.call( hero.querySelectorAll( '.academic-hero__dot' ) );
 		var counter = document.getElementById( 'heroSlideCounter' );
 		var prev = document.getElementById( 'heroPrevBottom' );
@@ -54,11 +53,6 @@
 				if ( 'inert' in slide ) {
 					slide.inert = ! active;
 				}
-			} );
-
-			tabs.forEach( function ( tab, idx ) {
-				tab.classList.toggle( 'is-active', idx === current );
-				tab.setAttribute( 'aria-current', idx === current ? 'true' : 'false' );
 			} );
 
 			dots.forEach( function ( dot, idx ) {
@@ -101,7 +95,7 @@
 			listeners.push( [ el, type, fn, opts ] );
 		}
 
-		tabs.concat( dots ).forEach( function ( el ) {
+		dots.forEach( function ( el ) {
 			on( el, 'click', function () {
 				go( parseInt( el.getAttribute( 'data-slide-index' ), 10 ) || 0 );
 			} );
