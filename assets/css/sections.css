@@ -48,6 +48,24 @@
 }
 
 /* --- Slides + transitions (Customizer → Pengaturan Carousel) ----------- */
+/* The slide itself only cross-fades (out fast, in quicker still); the
+   movement is choreographed per element below: text rises in line by line,
+   the image frame slides in and the photo settles from a slight zoom.
+   Motion amounts come from the animation type: fade-slide = full
+   choreography, fade = staggered fades only, none = instant. */
+.academic-hero {
+	--hero-d: var(--hero-anim-duration, 600ms);
+	--hero-rise: 26px;
+	--hero-shift: 56px;
+	--hero-zoom: 1.08;
+}
+
+.academic-hero--anim-fade {
+	--hero-rise: 0px;
+	--hero-shift: 0px;
+	--hero-zoom: 1;
+}
+
 .academic-hero__slide {
 	position: absolute;
 	inset: 0;
@@ -57,9 +75,8 @@
 	visibility: hidden;
 	pointer-events: none;
 	transition:
-		opacity var(--hero-anim-duration, 600ms) ease,
-		transform var(--hero-anim-duration, 600ms) var(--ease-standard),
-		visibility 0s linear var(--hero-anim-duration, 600ms);
+		opacity calc(var(--hero-d) * 0.6) ease,
+		visibility 0s linear calc(var(--hero-d) * 0.6);
 }
 
 .academic-hero__slide.is-active {
@@ -67,26 +84,83 @@
 	opacity: 1;
 	visibility: visible;
 	pointer-events: auto;
-	transform: none;
 	transition:
-		opacity var(--hero-anim-duration, 600ms) ease,
-		transform var(--hero-anim-duration, 600ms) var(--ease-standard),
+		opacity calc(var(--hero-d) * 0.4) ease,
 		visibility 0s;
 }
 
-.academic-hero--anim-fade-slide .academic-hero__slide:not(.is-active) {
-	transform: translateX(28px);
+/* Only after the first slide change (js/hero.js adds --animated), so the
+   initial page load paints immediately and doesn't delay the hero image. */
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__content > * {
+	animation: dq-hero-text-in var(--hero-d) var(--ease-standard) both;
 }
 
-.academic-hero--anim-none .academic-hero__slide {
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__content > :nth-child(1) { animation-delay: calc(var(--hero-d) * 0.10); }
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__content > :nth-child(2) { animation-delay: calc(var(--hero-d) * 0.22); }
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__content > :nth-child(3) { animation-delay: calc(var(--hero-d) * 0.34); }
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__content > :nth-child(4) { animation-delay: calc(var(--hero-d) * 0.46); }
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__content > :nth-child(5) { animation-delay: calc(var(--hero-d) * 0.58); }
+
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__image-frame {
+	animation: dq-hero-frame-in calc(var(--hero-d) * 1.4) var(--ease-standard) both;
+}
+
+/* `scale` (not `transform`) so it composes with the per-slide zoom that
+   the Customizer sets as an inline transform on the image. */
+.academic-hero--animated .academic-hero__slide.is-active .academic-hero__image {
+	animation: dq-hero-image-in calc(var(--hero-d) * 2.4) cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes dq-hero-text-in {
+	from {
+		opacity: 0;
+		translate: 0 var(--hero-rise);
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+	}
+}
+
+@keyframes dq-hero-frame-in {
+	from {
+		opacity: 0;
+		translate: var(--hero-shift) 0;
+	}
+	to {
+		opacity: 1;
+		translate: 0 0;
+	}
+}
+
+@keyframes dq-hero-image-in {
+	from {
+		scale: var(--hero-zoom);
+	}
+	to {
+		scale: 1;
+	}
+}
+
+.academic-hero--anim-none .academic-hero__slide,
+.academic-hero--anim-none .academic-hero__slide.is-active {
 	transition: none;
+}
+
+.academic-hero--anim-none .academic-hero__content > *,
+.academic-hero--anim-none .academic-hero__image-frame,
+.academic-hero--anim-none .academic-hero__image {
+	animation: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
 	.academic-hero__slide,
 	.academic-hero__slide.is-active {
 		transition: none;
-		transform: none;
+	}
+
+	.academic-hero__slide * {
+		animation: none !important;
 	}
 }
 

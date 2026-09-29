@@ -182,8 +182,8 @@ function dq_customize_register_hero( $wp_customize ) {
 	) );
 
 	$animation_choices = array(
-		'fade-slide' => __( 'Fade + gerakan horizontal halus', 'dzurriyyatul-academic' ),
-		'fade'       => __( 'Fade', 'dzurriyyatul-academic' ),
+		'fade-slide' => __( 'Bertahap: teks naik satu per satu, gambar bergeser & zoom halus', 'dzurriyyatul-academic' ),
+		'fade'       => __( 'Fade bertahap (tanpa gerakan)', 'dzurriyyatul-academic' ),
 		'none'       => __( 'Tanpa animasi', 'dzurriyyatul-academic' ),
 	);
 

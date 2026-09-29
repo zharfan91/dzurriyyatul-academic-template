@@ -44,7 +44,14 @@
 		};
 
 		function show( index ) {
-			current = ( index + total ) % total;
+			var target = ( index + total ) % total;
+
+			// Enables the staged text/image entrance (sections.css) from the
+			// first real slide change on, never on the initial paint.
+			if ( target !== current ) {
+				hero.classList.add( 'academic-hero--animated' );
+			}
+			current = target;
 
 			slides.forEach( function ( slide, idx ) {
 				var active = idx === current;
