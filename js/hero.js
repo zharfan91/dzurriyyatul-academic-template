@@ -1,7 +1,9 @@
 /**
  * Hero carousel: dot indicator + counter, previous/next, arrow
  * keys, touch swipe, autoplay (Customizer → Hero Slides → Pengaturan
- * Carousel) paused on hover/focus, and a prefers-reduced-motion escape hatch.
+ * Carousel) paused on hover/focus. Autoplay also runs for
+ * prefers-reduced-motion visitors (by request); for them sections.css
+ * switches slides instantly instead of animating.
  *
  * initHero() is re-run whenever the Customizer's selective refresh
  * re-renders the hero, so preview changes never leave a stale timer behind.
@@ -38,7 +40,6 @@
 		var timer = null;
 		var intervalTime = parseInt( stage.getAttribute( 'data-autoplay' ), 10 ) || 6000;
 		var autoplay = '1' === stage.getAttribute( 'data-autoplay-enabled' );
-		var reduceMotion = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 		var pad = function ( n ) {
 			return String( n ).padStart( 2, '0' );
 		};
@@ -80,7 +81,7 @@
 
 		function start() {
 			stop();
-			if ( reduceMotion || ! autoplay ) {
+			if ( ! autoplay ) {
 				return;
 			}
 			timer = window.setInterval( function () {
