@@ -57,8 +57,10 @@ if ( empty( $slides ) ) {
 }
 
 $total = count( $slides );
+$hero_frame_enabled = dq_hero_frame_settings()['enabled'];
 ?>
-<section class="academic-hero" id="beranda" aria-roledescription="carousel" aria-label="<?php esc_attr_e( 'Sorotan Program', 'dzurriyyatul-academic' ); ?>">
+<section class="academic-hero<?php echo $hero_frame_enabled ? ' academic-hero--frame-enabled' : ''; ?>" id="beranda" aria-roledescription="carousel" aria-label="<?php esc_attr_e( 'Sorotan Program', 'dzurriyyatul-academic' ); ?>">
+	<?php dq_hero_frame_render_clip_path(); ?>
 	<div class="academic-hero__pattern" aria-hidden="true"></div>
 
 	<div class="academic-container academic-hero__tabbar">

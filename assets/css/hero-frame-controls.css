@@ -1,0 +1,59 @@
+.dq-hero-frame-shape-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.dq-hero-frame-shape-option {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 4px;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+	text-align: center;
+}
+
+.dq-hero-frame-shape-option:hover {
+	border-color: #949494;
+}
+
+.dq-hero-frame-shape-option.is-selected {
+	border-color: #00a32a;
+	box-shadow: 0 0 0 1px #00a32a;
+}
+
+.dq-hero-frame-shape-option input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+}
+
+.dq-hero-frame-shape-thumb {
+	display: block;
+	width: 100%;
+	height: 40px;
+	background: #f0f0f1;
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.dq-hero-frame-shape-thumb svg {
+	width: 100%;
+	height: 100%;
+}
+
+.dq-hero-frame-shape-thumb path {
+	fill: #0c4b33;
+}
+
+.dq-hero-frame-shape-label {
+	font-size: 11px;
+	line-height: 1.3;
+	color: #1d2327;
+}
