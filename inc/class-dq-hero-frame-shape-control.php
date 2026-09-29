@@ -1,11 +1,9 @@
 <?php
 /**
- * Customizer control: visual thumbnail picker for the Hero image frame
- * shape (8 options) — the request explicitly asks for thumbnails instead
- * of a plain dropdown. Each thumbnail is a tiny live SVG preview of that
- * shape's actual clip-path, generated with dq_hero_frame_build_path() at
- * its default intensity/width/position, so what the admin sees matches
- * what they'll get.
+ * Customizer control: visual thumbnail picker for a Hero slide's frame
+ * shape (8 options). Each thumbnail is drawn from the real clip path
+ * (dq_hero_frame_build_path() at default intensity/width), so what the
+ * admin picks is what renders.
  *
  * @package DzurriyyatulAcademic
  */
@@ -24,33 +22,34 @@ if ( class_exists( 'WP_Customize_Control' ) && ! class_exists( 'DQ_Hero_Frame_Sh
 		public $type = 'dq_hero_frame_shape';
 
 		/**
-		 * Render a grid of clickable shape thumbnails; the underlying
-		 * <input type="radio"> keeps this working exactly like a native
-		 * control for Customizer's own change-detection/save handling.
+		 * Radio inputs keep Customizer's own change detection working; the
+		 * :checked state drives the selected styling in
+		 * assets/css/hero-frame-controls.css.
 		 */
 		public function render_content() {
-			$shapes  = dq_hero_frame_shapes();
 			$current = $this->value();
 			?>
 			<span class="customize-control-title"><?php echo esc_html( $this->label ); ?></span>
 			<?php if ( $this->description ) : ?>
-				<span class="description customize-control-description"><?php echo wp_kses_post( $this->description ); ?></span>
+				<span class="description customize-control-description"><?php echo esc_html( $this->description ); ?></span>
 			<?php endif; ?>
-			<div class="dq-hero-frame-shape-grid">
-				<?php foreach ( $shapes as $key => $shape ) : ?>
-					<?php $path = dq_hero_frame_build_path( $key, 'sedang', 'sedang', 'tengah' ); ?>
-					<label class="dq-hero-frame-shape-option<?php echo $key === $current ? ' is-selected' : ''; ?>">
+			<div class="dq-hero-frame-shape-grid" role="radiogroup" aria-label="<?php echo esc_attr( $this->label ); ?>">
+				<?php foreach ( dq_hero_frame_shapes() as $key => $shape ) : ?>
+					<label class="dq-hero-frame-shape-option">
 						<input
 							type="radio"
 							value="<?php echo esc_attr( $key ); ?>"
-							name="<?php echo esc_attr( $this->id ); ?>"
+							name="<?php echo esc_attr( '_customize-radio-' . $this->id ); ?>"
 							<?php $this->link(); ?>
 							<?php checked( $key, $current ); ?>
 						/>
 						<span class="dq-hero-frame-shape-thumb">
-							<svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true">
-								<path d="<?php echo esc_attr( $path ); ?>"></path>
+							<svg viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+								<path d="<?php echo esc_attr( dq_hero_frame_build_path( $key, 'sedang', 'sedang' ) ); ?>"></path>
 							</svg>
+							<span class="dq-hero-frame-shape-check" aria-hidden="true">
+								<svg viewBox="0 0 16 16" focusable="false"><path d="M3.5 8.5l3 3 6-6.5"></path></svg>
+							</span>
 						</span>
 						<span class="dq-hero-frame-shape-label"><?php echo esc_html( $shape['label'] ); ?></span>
 					</label>

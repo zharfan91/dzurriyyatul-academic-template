@@ -105,6 +105,7 @@ function dq_hero_slide_defaults() {
 		'tags'               => '',
 		'description'        => '',
 		'primary_cta_label'  => '',
+		'primary_cta_url'    => '',
 		'primary_cta_message'=> '',
 		'secondary_cta_label'=> '',
 		'secondary_cta_url'  => '',
@@ -128,7 +129,26 @@ function dq_hero_slide_defaults() {
 		'frame_shape'        => 'soft-wave',
 		'frame_intensity'    => 'sedang',
 		'frame_width'        => 'sedang',
-		'frame_position'     => 'tengah',
+	);
+}
+
+/**
+ * Carousel-wide Hero settings (Customizer → Hero Slides → Pengaturan
+ * Carousel) with their defaults applied.
+ *
+ * @return array{enabled:bool,autoplay:bool,duration:int,animation:string,animation_duration:int,show_navigation:bool,show_indicator:bool}
+ */
+function dq_hero_carousel_settings() {
+	$animation = dq_get_setting( 'hero_animation_type', 'fade-slide' );
+
+	return array(
+		'enabled'            => (bool) dq_get_setting( 'hero_carousel_enabled', true ),
+		'autoplay'           => (bool) dq_get_setting( 'hero_autoplay_enabled', true ),
+		'duration'           => max( 3000, min( 10000, absint( dq_get_setting( 'hero_autoplay_duration', 6000 ) ) ) ),
+		'animation'          => in_array( $animation, array( 'fade-slide', 'fade', 'none' ), true ) ? $animation : 'fade-slide',
+		'animation_duration' => max( 200, min( 1500, absint( dq_get_setting( 'hero_animation_duration', 600 ) ) ) ),
+		'show_navigation'    => (bool) dq_get_setting( 'hero_show_navigation', true ),
+		'show_indicator'     => (bool) dq_get_setting( 'hero_show_indicator', true ),
 	);
 }
 

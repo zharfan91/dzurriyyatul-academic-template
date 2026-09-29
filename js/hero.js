@@ -1,150 +1,171 @@
 /**
- * Hero carousel: tab/dot/arrow controls, keyboard navigation, autoplay
- * (enable + duration set via Appearance → Customize → Hero Slides →
- * Pengaturan Carousel), pause on hover/focus, and a prefers-reduced-motion
- * escape hatch (§25-26).
+ * Hero carousel: slide tabs, dot indicator + counter, previous/next, arrow
+ * keys, touch swipe, autoplay (Customizer → Hero Slides → Pengaturan
+ * Carousel) paused on hover/focus, and a prefers-reduced-motion escape hatch.
+ *
+ * initHero() is re-run whenever the Customizer's selective refresh
+ * re-renders the hero, so preview changes never leave a stale timer behind.
  */
 ( function () {
 	'use strict';
 
-	var stage = document.getElementById( 'heroCarouselStage' );
-	if ( ! stage ) {
-		return;
-	}
+	var teardown = null;
 
-	var slides = Array.prototype.slice.call( stage.querySelectorAll( '.academic-hero__slide' ) );
-	var tabs = Array.prototype.slice.call( document.querySelectorAll( '.academic-hero__tab' ) );
-	var dots = Array.prototype.slice.call( document.querySelectorAll( '.academic-hero__dot' ) );
-	var counter = document.getElementById( 'heroSlideCounter' );
-	var prevButtons = [ document.getElementById( 'heroPrevTop' ), document.getElementById( 'heroPrevBottom' ) ].filter( Boolean );
-	var nextButtons = [ document.getElementById( 'heroNextTop' ), document.getElementById( 'heroNextBottom' ) ].filter( Boolean );
-
-	var total = slides.length;
-	if ( total < 2 ) {
-		return;
-	}
-
-	var current = 0;
-	var timer = null;
-	var intervalTime = parseInt( stage.getAttribute( 'data-autoplay' ), 10 ) || 6000;
-	var autoplayEnabled = '0' !== stage.getAttribute( 'data-autoplay-enabled' );
-	var reduceMotion = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
-
-	function show( index ) {
-		if ( index < 0 ) {
-			index = total - 1;
+	function initHero() {
+		if ( teardown ) {
+			teardown();
+			teardown = null;
 		}
-		if ( index >= total ) {
-			index = 0;
-		}
-		current = index;
 
-		slides.forEach( function ( slide, idx ) {
-			var isActive = idx === current;
-			slide.classList.toggle( 'is-active', isActive );
-			slide.setAttribute( 'aria-hidden', isActive ? 'false' : 'true' );
-		} );
-
-		tabs.forEach( function ( tab, idx ) {
-			var isActive = idx === current;
-			tab.classList.toggle( 'is-active', isActive );
-			tab.setAttribute( 'aria-current', isActive ? 'true' : 'false' );
-		} );
-
-		dots.forEach( function ( dot, idx ) {
-			dot.classList.toggle( 'is-active', idx === current );
-		} );
-
-		if ( counter ) {
-			counter.textContent = String( current + 1 ).padStart( 2, '0' ) + ' / ' + String( total ).padStart( 2, '0' );
-		}
-	}
-
-	function start() {
-		// Always clear any running timer first (not just when the guard below
-		// passes) so a live Customizer-preview toggle from enabled to disabled
-		// — which calls start() again to apply the change — actually stops
-		// the interval instead of merely skipping the creation of a new one.
-		stop();
-		if ( reduceMotion || ! autoplayEnabled ) {
+		var hero = document.getElementById( 'beranda' );
+		var stage = document.getElementById( 'heroCarouselStage' );
+		if ( ! hero || ! stage ) {
 			return;
 		}
-		timer = window.setInterval( function () {
-			show( current + 1 );
-		}, intervalTime );
-	}
 
-	function stop() {
-		if ( timer ) {
-			window.clearInterval( timer );
-			timer = null;
+		var slides = Array.prototype.slice.call( stage.querySelectorAll( '.academic-hero__slide' ) );
+		var total = slides.length;
+		if ( total < 2 ) {
+			return;
 		}
-	}
 
-	tabs.forEach( function ( tab, idx ) {
-		tab.addEventListener( 'click', function () {
-			show( idx );
-			start();
-		} );
-	} );
+		var tabs = Array.prototype.slice.call( hero.querySelectorAll( '.academic-hero__tab' ) );
+		var dots = Array.prototype.slice.call( hero.querySelectorAll( '.academic-hero__dot' ) );
+		var counter = document.getElementById( 'heroSlideCounter' );
+		var prev = document.getElementById( 'heroPrevBottom' );
+		var next = document.getElementById( 'heroNextBottom' );
 
-	dots.forEach( function ( dot, idx ) {
-		dot.addEventListener( 'click', function () {
-			show( idx );
-			start();
-		} );
-	} );
+		var current = 0;
+		var timer = null;
+		var intervalTime = parseInt( stage.getAttribute( 'data-autoplay' ), 10 ) || 6000;
+		var autoplay = '1' === stage.getAttribute( 'data-autoplay-enabled' );
+		var reduceMotion = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+		var pad = function ( n ) {
+			return String( n ).padStart( 2, '0' );
+		};
 
-	prevButtons.forEach( function ( btn ) {
-		btn.addEventListener( 'click', function () {
-			show( current - 1 );
-			start();
-		} );
-	} );
+		function show( index ) {
+			current = ( index + total ) % total;
 
-	nextButtons.forEach( function ( btn ) {
-		btn.addEventListener( 'click', function () {
-			show( current + 1 );
-			start();
-		} );
-	} );
-
-	stage.addEventListener( 'keydown', function ( event ) {
-		if ( 'ArrowLeft' === event.key ) {
-			show( current - 1 );
-			start();
-		} else if ( 'ArrowRight' === event.key ) {
-			show( current + 1 );
-			start();
-		}
-	} );
-
-	stage.addEventListener( 'mouseenter', stop );
-	stage.addEventListener( 'mouseleave', start );
-	stage.addEventListener( 'focusin', stop );
-	stage.addEventListener( 'focusout', start );
-
-	show( 0 );
-	start();
-
-	// Reload-free Customizer preview: when running inside the preview iframe
-	// (Appearance → Customize → Hero Slides → Pengaturan Carousel), react to
-	// the autoplay enable/duration settings changing and restart the timer
-	// with the new value instead of waiting for a full iframe refresh.
-	if ( window.wp && window.wp.customize ) {
-		wp.customize.bind( 'preview-ready', function () {
-			wp.customize( 'dq_theme_settings[hero_autoplay_enabled]', function ( value ) {
-				value.bind( function ( newValue ) {
-					autoplayEnabled = !! newValue;
-					start();
-				} );
+			slides.forEach( function ( slide, idx ) {
+				var active = idx === current;
+				slide.classList.toggle( 'is-active', active );
+				slide.setAttribute( 'aria-hidden', active ? 'false' : 'true' );
+				if ( 'inert' in slide ) {
+					slide.inert = ! active;
+				}
 			} );
 
-			wp.customize( 'dq_theme_settings[hero_autoplay_duration]', function ( value ) {
-				value.bind( function ( newValue ) {
-					intervalTime = parseInt( newValue, 10 ) || 6000;
-					start();
-				} );
+			tabs.forEach( function ( tab, idx ) {
+				tab.classList.toggle( 'is-active', idx === current );
+				tab.setAttribute( 'aria-current', idx === current ? 'true' : 'false' );
+			} );
+
+			dots.forEach( function ( dot, idx ) {
+				dot.classList.toggle( 'is-active', idx === current );
+			} );
+
+			if ( counter ) {
+				counter.textContent = pad( current + 1 ) + ' / ' + pad( total );
+			}
+		}
+
+		function stop() {
+			if ( timer ) {
+				window.clearInterval( timer );
+				timer = null;
+			}
+		}
+
+		function start() {
+			stop();
+			if ( reduceMotion || ! autoplay ) {
+				return;
+			}
+			timer = window.setInterval( function () {
+				show( current + 1 );
+			}, intervalTime );
+		}
+
+		function go( index ) {
+			show( index );
+			start();
+		}
+
+		var listeners = [];
+		function on( el, type, fn, opts ) {
+			if ( ! el ) {
+				return;
+			}
+			el.addEventListener( type, fn, opts );
+			listeners.push( [ el, type, fn, opts ] );
+		}
+
+		tabs.concat( dots ).forEach( function ( el ) {
+			on( el, 'click', function () {
+				go( parseInt( el.getAttribute( 'data-slide-index' ), 10 ) || 0 );
+			} );
+		} );
+
+		on( prev, 'click', function () {
+			go( current - 1 );
+		} );
+		on( next, 'click', function () {
+			go( current + 1 );
+		} );
+
+		on( stage, 'keydown', function ( event ) {
+			if ( 'ArrowLeft' === event.key ) {
+				go( current - 1 );
+			} else if ( 'ArrowRight' === event.key ) {
+				go( current + 1 );
+			}
+		} );
+
+		var touchX = null;
+		on( stage, 'touchstart', function ( event ) {
+			touchX = event.touches[ 0 ].clientX;
+		}, { passive: true } );
+		on( stage, 'touchend', function ( event ) {
+			if ( null === touchX ) {
+				return;
+			}
+			var delta = event.changedTouches[ 0 ].clientX - touchX;
+			touchX = null;
+			if ( Math.abs( delta ) > 50 ) {
+				go( delta < 0 ? current + 1 : current - 1 );
+			}
+		}, { passive: true } );
+
+		on( hero, 'mouseenter', stop );
+		on( hero, 'mouseleave', start );
+		on( hero, 'focusin', stop );
+		on( hero, 'focusout', start );
+
+		show( 0 );
+		start();
+
+		teardown = function () {
+			stop();
+			listeners.forEach( function ( l ) {
+				l[ 0 ].removeEventListener( l[ 1 ], l[ 2 ], l[ 3 ] );
+			} );
+		};
+	}
+
+	initHero();
+
+	// Customizer preview: the hero is re-rendered by the 'dq_hero' partial.
+	if ( window.wp && window.wp.customize ) {
+		window.wp.customize.bind( 'preview-ready', function () {
+			var selectiveRefresh = window.wp.customize.selectiveRefresh;
+			if ( ! selectiveRefresh ) {
+				return;
+			}
+			selectiveRefresh.bind( 'partial-content-rendered', function ( placement ) {
+				if ( placement && placement.partial && 'dq_hero' === placement.partial.id ) {
+					initHero();
+				}
 			} );
 		} );
 	}

@@ -23,19 +23,6 @@
 		display: inline-flex;
 	}
 
-	.academic-hero__arrows--top {
-		display: flex;
-	}
-
-	.academic-hero__footer {
-		flex-direction: row;
-		justify-content: space-between;
-	}
-
-	.academic-hero__arrows {
-		display: flex;
-	}
-
 	.academic-announcement__row {
 		flex-direction: row;
 		justify-content: space-between;
@@ -153,16 +140,41 @@
 
 /* --- 1024px (lg) ----------------------------------------------------------*/
 @media (min-width: 1024px) {
-	.academic-hero__grid {
-		grid-template-columns: repeat(12, 1fr);
+	/* Editorial 50/50: text in the container's left half, image filling the
+	   slide's right half edge-to-edge (top, bottom and right). */
+	.academic-hero--editorial .academic-hero__slide {
+		min-height: clamp(540px, 68vh, 620px);
 	}
 
-	.academic-hero__content {
-		grid-column: span 7;
+	.academic-hero--editorial .academic-hero__grid {
+		flex: 1 1 auto;
+		width: 100%;
+		grid-template-columns: 1fr 1fr;
 	}
 
-	.academic-hero__visual {
-		grid-column: span 5;
+	.academic-hero--editorial .academic-hero__content {
+		grid-column: 1;
+		padding-block: var(--space-2xl);
+		padding-right: var(--space-xl);
+	}
+
+	.academic-hero--editorial .academic-hero__visual {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		width: 50%;
+		padding: 0;
+	}
+
+	.academic-hero--editorial .academic-hero__image-frame {
+		height: 100%;
+		aspect-ratio: auto;
+		border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+	}
+
+	.academic-hero--editorial .academic-hero__image-frame--framed {
+		border-radius: 0;
 	}
 
 	.academic-hero__heading {

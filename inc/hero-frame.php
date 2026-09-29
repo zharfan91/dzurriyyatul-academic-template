@@ -1,20 +1,19 @@
 <?php
 /**
- * Abstract left-edge frame for the Hero image — an enhancement layered onto
- * the existing hero-carousel.php markup (see .academic-hero__image-frame),
- * not a replacement for it. Top/right/bottom edges of the image always stay
- * straight; only the left edge gets an organic/abstract path, built as an
- * SVG clipPath (objectBoundingBox units, so one path definition scales
- * correctly to any image size — the reason this uses an SVG <clipPath>
- * rather than CSS clip-path: path(), which has no percentage-unit support).
+ * Abstract left-edge frame for each Hero slide's image.
  *
- * Each of the 3 hero slides has its OWN independent frame configuration
- * (enable/shape/intensity/width/position), stored alongside that slide's
- * other fields in dq_theme_settings[hero_slides][$i][...] — registered as
- * part of the main per-slide field loop in inc/customizer.php, not as a
- * separate global theme_mod section. This file keeps the shape math (proven
- * correct against a PHP/JS cross-validation harness) plus the per-slide
- * clip-path rendering and the sanitize callbacks the Customizer controls use.
+ * The frame is an SVG <clipPath> in objectBoundingBox units (0-1), so one
+ * path definition scales to any image size — CSS clip-path: path() has no
+ * percentage units, which is why this isn't done in CSS alone. The top,
+ * right and bottom edges are always straight; only the left edge is an
+ * organic curve, drawn as a smooth Catmull-Rom spline (converted to cubic
+ * Béziers) through each shape's control points. The curve's end points sit
+ * inset from the left edge, so it never degenerates into a corner-to-corner
+ * diagonal cut.
+ *
+ * Shapes are defined here (not as static .svg files) because intensity and
+ * width reshape the path per slide; js/customizer-hero-frame-preview.js
+ * mirrors dq_hero_frame_build_path() exactly for live preview.
  *
  * @package DzurriyyatulAcademic
  */
@@ -24,16 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * The 8 selectable frame shapes. Each is a smooth or angular path along the
- * LEFT edge only, described as a list of [x, y] control points in
- * objectBoundingBox space (0-1) — y runs top(0) to bottom(1), x is how far
- * the curve bulges right into the image (0 = flush with the left edge).
- * Points are listed bottom-to-top (path travels from bottom-left corner up
- * to top-left corner).
- *
- * 'curve' => 'quadratic' joins points with smooth Q-curves through each
- * point as its own control point (organic look); 'line' joins them with
- * straight L segments (faceted/angular look, used by Sharp Abstract).
+ * The 8 selectable frame shapes. Points are [x, y] in objectBoundingBox
+ * space, listed bottom (y = 1) to top (y = 0); x is how far the image's
+ * visible left edge sits in from the frame's left side at that height.
+ * 'curve' => 'smooth' draws a spline through the points, 'line' joins them
+ * with straight segments (Sharp Abstract only).
  *
  * @return array<string,array{label:string,curve:string,points:array<array{0:float,1:float}>}>
  */
@@ -41,54 +35,49 @@ function dq_hero_frame_shapes() {
 	return array(
 		'soft-wave'      => array(
 			'label'  => __( 'Soft Wave', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			'points' => array( array( 0.09, 0.72 ), array( 0.05, 0.28 ) ),
-		),
-		'deep-wave'      => array(
-			'label'  => __( 'Deep Wave', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			'points' => array( array( 0.20, 0.68 ), array( 0.18, 0.32 ) ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.16, 1 ), array( 0.06, 0.7 ), array( 0.12, 0.38 ), array( 0.04, 0.1 ), array( 0.08, 0 ) ),
 		),
 		'organic-curve'  => array(
 			'label'  => __( 'Organic Curve', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			'points' => array( array( 0.11, 0.80 ), array( 0.15, 0.42 ), array( 0.04, 0.12 ) ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.22, 1 ), array( 0.03, 0.55 ), array( 0.2, 0 ) ),
+		),
+		'deep-wave'      => array(
+			'label'  => __( 'Deep Wave', 'dzurriyyatul-academic' ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.26, 1 ), array( 0.03, 0.68 ), array( 0.24, 0.34 ), array( 0.06, 0 ) ),
 		),
 		's-curve'        => array(
 			'label'  => __( 'S-Curve', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			'points' => array( array( -0.06, 0.75 ), array( 0.16, 0.50 ), array( -0.02, 0.25 ) ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.26, 1 ), array( 0.22, 0.78 ), array( 0.12, 0.5 ), array( 0.03, 0.22 ), array( 0.02, 0 ) ),
 		),
-		'liquid'         => array(
-			'label'  => __( 'Liquid', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			'points' => array( array( 0.07, 0.85 ), array( 0.14, 0.63 ), array( 0.03, 0.42 ), array( 0.11, 0.18 ) ),
+		'liquid-curve'   => array(
+			'label'  => __( 'Liquid Curve', 'dzurriyyatul-academic' ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.14, 1 ), array( 0.03, 0.8 ), array( 0.17, 0.58 ), array( 0.06, 0.36 ), array( 0.15, 0.15 ), array( 0.09, 0 ) ),
 		),
 		'double-wave'    => array(
 			'label'  => __( 'Double Wave', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			'points' => array( array( 0.12, 0.82 ), array( 0.02, 0.62 ), array( 0.12, 0.38 ), array( 0.02, 0.16 ) ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.06, 1 ), array( 0.2, 0.75 ), array( 0.05, 0.5 ), array( 0.2, 0.25 ), array( 0.06, 0 ) ),
 		),
 		'sharp-abstract' => array(
 			'label'  => __( 'Sharp Abstract', 'dzurriyyatul-academic' ),
 			'curve'  => 'line',
-			'points' => array( array( 0.16, 0.70 ), array( 0.03, 0.50 ), array( 0.16, 0.30 ) ),
+			'points' => array( array( 0.2, 1 ), array( 0.05, 0.64 ), array( 0.16, 0.4 ), array( 0.03, 0 ) ),
 		),
 		'minimal-curve'  => array(
 			'label'  => __( 'Minimal Curve', 'dzurriyyatul-academic' ),
-			'curve'  => 'quadratic',
-			// 2 close points (not 1) so the intensity multiplier — which
-			// scales each point's distance from the shape's average X —
-			// has something to act on; a single-point shape would always
-			// average to itself and make "intensity" a no-op.
-			'points' => array( array( 0.03, 0.65 ), array( 0.06, 0.35 ) ),
+			'curve'  => 'smooth',
+			'points' => array( array( 0.09, 1 ), array( 0.02, 0.5 ), array( 0.09, 0 ) ),
 		),
 	);
 }
 
 /**
- * Width presets: multiply every control point's X (how far the curve
- * reaches into the image) by this factor.
+ * Width presets: scale how far the curve reaches into the image.
  *
  * @return array<string,float>
  */
@@ -101,113 +90,97 @@ function dq_hero_frame_width_multipliers() {
 }
 
 /**
- * Intensity presets: pull each point's X toward (low) or push it away from
- * (high) the average of all points, exaggerating or flattening the
- * difference between the curve's peaks and troughs without changing its
- * overall reach.
+ * Intensity presets: flatten (low) or exaggerate (high) each point's
+ * distance from the shape's average reach — i.e. how pronounced the waves
+ * are — without changing the overall reach.
  *
  * @return array<string,float>
  */
 function dq_hero_frame_intensity_multipliers() {
 	return array(
-		'ringan' => 0.55,
+		'ringan' => 0.5,
 		'sedang' => 1.0,
-		'kuat'   => 1.6,
+		'kuat'   => 1.5,
 	);
 }
 
 /**
- * Position presets: shift the whole curve up or down within the frame by
- * this fraction of the frame's height, so the same shape can sit higher,
- * centered, or lower.
+ * Round to 4 decimals, half away from zero. Deliberately not PHP's round():
+ * its handling of binary-float ties (e.g. 0.12025) differs from JS and has
+ * changed across PHP versions, and this must match roundFrame() in
+ * js/customizer-hero-frame-preview.js digit-for-digit.
  *
- * @return array<string,float>
+ * @param float $value
+ * @return float
  */
-function dq_hero_frame_position_offsets() {
-	return array(
-		'atas'   => -0.12,
-		'tengah' => 0,
-		'bawah'  => 0.12,
-	);
+function dq_hero_frame_round( $value ) {
+	$n    = (float) sprintf( '%.6F', $value * 10000 );
+	$sign = $n < 0 ? -1 : 1;
+	return ( $sign * floor( abs( $n ) + 0.5 ) ) / 10000 + 0; // + 0 turns -0 into 0.
 }
 
 /**
- * Build the final SVG path `d` attribute (objectBoundingBox space) for the
- * given shape + intensity + width + position combination. Shared by the
- * PHP-rendered markup and mirrored in JS (assets handled in
- * dq_hero_frame_enqueue_preview_script()) for reload-free Customizer preview.
+ * Build the SVG path `d` attribute (objectBoundingBox space) for a shape +
+ * intensity + width combination. Mirrored exactly in
+ * js/customizer-hero-frame-preview.js.
  *
  * @param string $shape_key
  * @param string $intensity_key
  * @param string $width_key
- * @param string $position_key
  * @return string
  */
-function dq_hero_frame_build_path( $shape_key, $intensity_key, $width_key, $position_key ) {
+function dq_hero_frame_build_path( $shape_key, $intensity_key, $width_key ) {
 	$shapes = dq_hero_frame_shapes();
-	if ( ! isset( $shapes[ $shape_key ] ) ) {
-		$shape_key = 'soft-wave';
-	}
-	$shape = $shapes[ $shape_key ];
+	$shape  = isset( $shapes[ $shape_key ] ) ? $shapes[ $shape_key ] : $shapes['soft-wave'];
 
-	$width_mult    = isset( dq_hero_frame_width_multipliers()[ $width_key ] ) ? dq_hero_frame_width_multipliers()[ $width_key ] : 1.0;
-	$intensity_mult = isset( dq_hero_frame_intensity_multipliers()[ $intensity_key ] ) ? dq_hero_frame_intensity_multipliers()[ $intensity_key ] : 1.0;
-	$position_offset = isset( dq_hero_frame_position_offsets()[ $position_key ] ) ? dq_hero_frame_position_offsets()[ $position_key ] : 0;
+	$widths      = dq_hero_frame_width_multipliers();
+	$intensities = dq_hero_frame_intensity_multipliers();
+	$width_mult  = isset( $widths[ $width_key ] ) ? $widths[ $width_key ] : 1.0;
+	$int_mult    = isset( $intensities[ $intensity_key ] ) ? $intensities[ $intensity_key ] : 1.0;
 
 	$points = $shape['points'];
-	$avg_x  = array_sum( array_column( $points, 0 ) ) / max( 1, count( $points ) );
+	$avg_x  = array_sum( array_column( $points, 0 ) ) / count( $points );
 
-	$adjusted = array();
+	$p = array();
 	foreach ( $points as $point ) {
-		list( $x, $y ) = $point;
-
-		// Intensity: pull toward / push away from the average bulge depth.
-		$x = $avg_x + ( $x - $avg_x ) * $intensity_mult;
-		// Width: scale overall reach.
-		$x = $x * $width_mult;
-		// Position: shift vertically, clamped to stay inside the frame.
-		$y = max( 0.02, min( 0.98, $y + $position_offset ) );
-
-		$adjusted[] = array( round( $x, 4 ), round( $y, 4 ) );
+		$x   = ( $avg_x + ( $point[0] - $avg_x ) * $int_mult ) * $width_mult;
+		$x   = max( 0, min( 0.45, $x ) );
+		$p[] = array( dq_hero_frame_round( $x ), $point[1] );
 	}
 
-	// Path: start top-right -> straight down right edge -> straight along
-	// bottom edge -> up the left edge via the (possibly organic) points,
-	// in the order supplied (bottom-most point first) -> straight across
-	// the top edge back to the start, closing the shape.
-	$d  = 'M 1,0 L 1,1 L 0,1 ';
-	$prev = array( 0, 1 );
+	$last = count( $p ) - 1;
 
-	if ( 'line' === $shape['curve'] ) {
-		foreach ( $adjusted as $point ) {
-			$d   .= 'L ' . $point[0] . ',' . $point[1] . ' ';
-			$prev = $point;
+	// Straight top edge from the curve's top end to the top-right corner,
+	// straight right and bottom edges, then the organic left edge upward.
+	$d = 'M ' . $p[ $last ][0] . ',0 L 1,0 L 1,1 L ' . $p[0][0] . ',1 ';
+
+	for ( $i = 0; $i < $last; $i++ ) {
+		if ( 'line' === $shape['curve'] ) {
+			$d .= 'L ' . $p[ $i + 1 ][0] . ',' . $p[ $i + 1 ][1] . ' ';
+			continue;
 		}
-	} else {
-		foreach ( $adjusted as $point ) {
-			// Quadratic curve using the midpoint between the previous
-			// anchor and this control point as the curve's own control
-			// handle, and this point as the new anchor — gives a smooth,
-			// continuous organic line through every listed point.
-			$ctrl_x = round( ( $prev[0] + $point[0] ) / 2, 4 );
-			$ctrl_y = round( ( $prev[1] + $point[1] ) / 2, 4 );
-			$d     .= 'Q ' . $ctrl_x . ',' . $ctrl_y . ' ' . $point[0] . ',' . $point[1] . ' ';
-			$prev   = $point;
-		}
+
+		$p0 = $p[ max( 0, $i - 1 ) ];
+		$p1 = $p[ $i ];
+		$p2 = $p[ $i + 1 ];
+		$p3 = $p[ min( $last, $i + 2 ) ];
+
+		$c1x = dq_hero_frame_round( $p1[0] + ( $p2[0] - $p0[0] ) / 6 );
+		$c1y = dq_hero_frame_round( $p1[1] + ( $p2[1] - $p0[1] ) / 6 );
+		$c2x = dq_hero_frame_round( $p2[0] - ( $p3[0] - $p1[0] ) / 6 );
+		$c2y = dq_hero_frame_round( $p2[1] - ( $p3[1] - $p1[1] ) / 6 );
+
+		$d .= 'C ' . $c1x . ',' . $c1y . ' ' . $c2x . ',' . $c2y . ' ' . $p2[0] . ',' . $p2[1] . ' ';
 	}
 
-	$d .= 'L 0,0 Z';
-
-	return $d;
+	return $d . 'Z';
 }
 
 /**
- * Extract one slide's frame settings from its already-fetched
- * dq_get_hero_slide() array (frame fields live alongside the slide's other
- * content, not in a separate global store).
+ * One slide's frame settings, from its dq_get_hero_slide() array.
  *
- * @param array $slide A slide array as returned by dq_get_hero_slide().
- * @return array{enabled:bool,shape:string,intensity:string,width:string,position:string}
+ * @param array $slide
+ * @return array{enabled:bool,shape:string,intensity:string,width:string}
  */
 function dq_hero_frame_settings_for_slide( $slide ) {
 	return array(
@@ -215,35 +188,27 @@ function dq_hero_frame_settings_for_slide( $slide ) {
 		'shape'     => $slide['frame_shape'],
 		'intensity' => $slide['frame_intensity'],
 		'width'     => $slide['frame_width'],
-		'position'  => $slide['frame_position'],
 	);
 }
 
 /**
- * Render one shared <svg><defs> holding one <clipPath> PER hero slide index
- * (0-2), each with its own path built from that slide's independent frame
- * settings. Call from hero-carousel.php right before the slides markup.
+ * Render one hidden <svg><defs> holding a <clipPath> per slide index (0-2).
+ * Every index gets one even when that slide's frame is off, so the
+ * Customizer preview can switch a frame on without creating SVG nodes.
  *
- * Every index gets a clipPath regardless of that slide's enabled state (even
- * disabled ones), so postMessage live preview in the Customizer can flip a
- * slide's frame on without needing to create SVG nodes on the fly — see
- * js/customizer-hero-frame-preview.js.
- *
- * @param array<int,array> $slides Slide arrays keyed by index, as built in
- *                                 hero-carousel.php.
+ * @param array<int,array> $slides Slide arrays keyed by original index.
  */
 function dq_hero_frame_render_clip_paths( $slides ) {
 	?>
-	<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;">
+	<svg class="academic-hero__clip-defs" width="0" height="0" aria-hidden="true" focusable="false">
 		<defs>
 			<?php for ( $i = 0; $i < 3; $i++ ) : ?>
 				<?php
-				$slide    = isset( $slides[ $i ] ) ? $slides[ $i ] : dq_hero_slide_defaults();
-				$settings = dq_hero_frame_settings_for_slide( $slide );
-				$d        = dq_hero_frame_build_path( $settings['shape'], $settings['intensity'], $settings['width'], $settings['position'] );
+				$settings = dq_hero_frame_settings_for_slide( isset( $slides[ $i ] ) ? $slides[ $i ] : dq_hero_slide_defaults() );
+				$d        = dq_hero_frame_build_path( $settings['shape'], $settings['intensity'], $settings['width'] );
 				?>
 				<clipPath id="dq-hero-frame-clip-<?php echo esc_attr( $i ); ?>" clipPathUnits="objectBoundingBox">
-					<path d="<?php echo esc_attr( $d ); ?>" id="dq-hero-frame-clip-path-<?php echo esc_attr( $i ); ?>"></path>
+					<path id="dq-hero-frame-clip-path-<?php echo esc_attr( $i ); ?>" d="<?php echo esc_attr( $d ); ?>"></path>
 				</clipPath>
 			<?php endfor; ?>
 		</defs>
@@ -252,10 +217,7 @@ function dq_hero_frame_render_clip_paths( $slides ) {
 }
 
 /**
- * Sanitize a value against a known key set, falling back to $default when
- * the submitted value isn't one of the allowed keys.
- *
- * @param string $value
+ * @param mixed  $value
  * @param array  $allowed_keys
  * @param string $default
  * @return string
@@ -290,24 +252,7 @@ function dq_hero_frame_sanitize_width( $value ) {
 }
 
 /**
- * @param mixed $value
- * @return string
- */
-function dq_hero_frame_sanitize_position( $value ) {
-	return dq_hero_frame_sanitize_key( $value, array_keys( dq_hero_frame_position_offsets() ), 'tengah' );
-}
-
-/**
- * The 5 frame controls (enable/shape/intensity/width/position) are
- * registered per-slide as part of the main Hero Slides field loop in
- * inc/customizer.php (each slide gets its own independent frame section),
- * not here — this file only supplies the shape math + sanitize callbacks
- * that loop uses, and the shared rendering/preview plumbing below.
- */
-
-/**
- * Enqueue the visual shape-picker's grid/thumbnail CSS on the Customizer
- * controls screen only.
+ * Shape-picker grid/thumbnail CSS, Customizer controls screen only.
  */
 function dq_hero_frame_enqueue_controls_assets() {
 	wp_enqueue_style( 'dq-hero-frame-controls', DQ_THEME_URI . '/assets/css/hero-frame-controls.css', array(), DQ_THEME_VERSION );
@@ -315,11 +260,8 @@ function dq_hero_frame_enqueue_controls_assets() {
 add_action( 'customize_controls_enqueue_scripts', 'dq_hero_frame_enqueue_controls_assets' );
 
 /**
- * Reload-free live preview: mirrors dq_hero_frame_build_path() in JS and
- * rewrites each slide's clip-path <path> element's "d" attribute directly
- * whenever any of that slide's frame settings changes in the Customizer
- * (and likewise for image position/zoom), instead of refreshing the whole
- * preview iframe. See js/customizer-hero-frame-preview.js.
+ * Live preview for frame + image position/zoom (see
+ * js/customizer-hero-frame-preview.js).
  */
 function dq_hero_frame_enqueue_preview_script() {
 	wp_enqueue_script(
@@ -332,10 +274,13 @@ function dq_hero_frame_enqueue_preview_script() {
 
 	wp_add_inline_script(
 		'dq-hero-frame-preview',
-		'window.dqHeroFrameShapes = ' . wp_json_encode( dq_hero_frame_shapes() ) . ';' .
-		'window.dqHeroFrameWidthMultipliers = ' . wp_json_encode( dq_hero_frame_width_multipliers() ) . ';' .
-		'window.dqHeroFrameIntensityMultipliers = ' . wp_json_encode( dq_hero_frame_intensity_multipliers() ) . ';' .
-		'window.dqHeroFramePositionOffsets = ' . wp_json_encode( dq_hero_frame_position_offsets() ) . ';',
+		'window.dqHeroFrame = ' . wp_json_encode(
+			array(
+				'shapes'      => dq_hero_frame_shapes(),
+				'widths'      => dq_hero_frame_width_multipliers(),
+				'intensities' => dq_hero_frame_intensity_multipliers(),
+			)
+		) . ';',
 		'before'
 	);
 }

@@ -46,8 +46,13 @@ function dq_settings_schema() {
 		'legal_note'              => 'textarea',
 		'about_page_url'          => 'url',
 		'seo_default_description' => 'textarea',
+		'hero_carousel_enabled'    => 'checkbox',
 		'hero_autoplay_enabled'    => 'checkbox',
 		'hero_autoplay_duration'   => 'number',
+		'hero_animation_type'      => 'text',
+		'hero_animation_duration'  => 'number',
+		'hero_show_navigation'     => 'checkbox',
+		'hero_show_indicator'      => 'checkbox',
 		'integrity_eyebrow_text'   => 'text',
 		'integrity_heading'        => 'text',
 		'integrity_notice_text'    => 'textarea',
@@ -80,6 +85,7 @@ function dq_hero_slide_schema() {
 		'tags'                => 'text',
 		'description'         => 'textarea',
 		'primary_cta_label'   => 'text',
+		'primary_cta_url'     => 'url',
 		'primary_cta_message' => 'textarea',
 		'secondary_cta_label' => 'text',
 		'secondary_cta_url'   => 'url',
@@ -103,7 +109,6 @@ function dq_hero_slide_schema() {
 		'frame_shape'         => 'text',
 		'frame_intensity'     => 'text',
 		'frame_width'         => 'text',
-		'frame_position'      => 'text',
 	);
 }
 
@@ -118,6 +123,89 @@ function dq_register_setting() {
 	) );
 }
 add_action( 'admin_init', 'dq_register_setting' );
+
+/**
+ * Starter copy for the 3 hero slides (Consultation / Publication / Data).
+ *
+ * @return array<int,array<string,string>>
+ */
+function dq_hero_slide_starter_content() {
+	return array(
+		array(
+			'tab_label'           => 'Pusat Konsultasi & Pendampingan',
+			'badge_text'          => 'Pusat Konsultasi & Pendampingan Akademik',
+			'heading_line1'       => "DZURRIYYATUL QUR'AN",
+			'heading_line2'       => 'ACADEMIC',
+			'tagline_quote'       => 'Mendampingi Proses, Mengembangkan Kompetensi.',
+			'description'         => 'Kami hadir untuk mendampingi mahasiswa diploma, sarjana, hingga pascasarjana memahami metodologi riset, merumuskan argumentasi ilmiah, dan menyelesaikan karya akhir dengan pendampingan profesional, edukatif, dan berintegritas tinggi.',
+			'primary_cta_label'   => 'Konsultasi Sekarang',
+			'secondary_cta_label' => 'Lihat Layanan Kami',
+			'secondary_cta_url'   => '#layanan',
+		),
+		array(
+			'tab_label'           => 'Publikasi Ilmiah & Jurnal',
+			'badge_text'          => 'Publikasi Ilmiah & Jurnal Bereputasi',
+			'heading_line1'       => 'PUBLIKASIKAN',
+			'heading_line2'       => 'RISET ANDA',
+			'tagline_quote'       => 'Dari Naskah hingga Publikasi.',
+			'description'         => 'Pendampingan penyusunan artikel ilmiah, literature review, pemilihan jurnal, formatting manuscript, hingga persiapan publikasi pada jurnal yang sesuai dengan bidang penelitian.',
+			'primary_cta_label'   => 'Konsultasi Publikasi',
+			'secondary_cta_label' => 'Lihat Layanan',
+			'secondary_cta_url'   => '#layanan',
+		),
+		array(
+			'tab_label'           => 'Analisis Data & Metodologi',
+			'badge_text'          => 'Analisis Data & Metodologi Riset',
+			'heading_line1'       => 'DATA MENJADI',
+			'heading_line2'       => 'ARGUMENTASI',
+			'tagline_quote'       => 'Analisis Tepat, Kesimpulan Lebih Kuat.',
+			'description'         => 'Membantu memahami dan mengolah data penelitian dengan pendekatan metodologi yang tepat, termasuk analisis statistik, SPSS, SEM, dan kebutuhan analisis penelitian lainnya.',
+			'primary_cta_label'   => 'Konsultasi Data',
+			'secondary_cta_label' => 'Pelajari Layanan',
+			'secondary_cta_url'   => '#layanan',
+		),
+	);
+}
+
+/**
+ * One-time migration to the 3-slide hero: any slide that has no heading yet
+ * (i.e. was never configured) gets the starter copy. Slides that already
+ * have a heading are left untouched, so existing content is never lost.
+ */
+function dq_migrate_hero_slides() {
+	if ( (int) get_option( 'dq_hero_content_version', 0 ) >= 2 ) {
+		return;
+	}
+
+	$settings = get_option( 'dq_theme_settings', array() );
+	if ( ! is_array( $settings ) ) {
+		$settings = array();
+	}
+	$slides = isset( $settings['hero_slides'] ) && is_array( $settings['hero_slides'] ) ? $settings['hero_slides'] : array();
+
+	foreach ( dq_hero_slide_starter_content() as $i => $starter ) {
+		$slide = isset( $slides[ $i ] ) && is_array( $slides[ $i ] ) ? $slides[ $i ] : array();
+
+		if ( isset( $slide['heading_line1'] ) && '' !== trim( (string) $slide['heading_line1'] ) ) {
+			continue;
+		}
+
+		foreach ( $starter as $key => $text ) {
+			if ( ! isset( $slide[ $key ] ) || '' === trim( (string) $slide[ $key ] ) ) {
+				$slide[ $key ] = $text;
+			}
+		}
+		$slide['enabled'] = true;
+		$slides[ $i ]     = $slide;
+	}
+
+	ksort( $slides );
+	$settings['hero_slides'] = $slides;
+
+	update_option( 'dq_theme_settings', $settings );
+	update_option( 'dq_hero_content_version', 2 );
+}
+add_action( 'init', 'dq_migrate_hero_slides', 1 );
 
 /**
  * Sanitize one scalar value by its declared type.
@@ -168,8 +256,13 @@ function dq_sanitize_theme_settings( $input ) {
 	// default — silently disabling every slide's frame/visibility on the
 	// first Customizer save after an update.
 	$flat_defaults = array(
-		'hero_autoplay_enabled'  => true,
-		'hero_autoplay_duration' => 6000,
+		'hero_carousel_enabled'   => true,
+		'hero_autoplay_enabled'   => true,
+		'hero_autoplay_duration'  => 6000,
+		'hero_animation_type'     => 'fade-slide',
+		'hero_animation_duration' => 600,
+		'hero_show_navigation'    => true,
+		'hero_show_indicator'     => true,
 	);
 
 	foreach ( dq_settings_schema() as $key => $type ) {
