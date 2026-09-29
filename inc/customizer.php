@@ -73,12 +73,26 @@ function dq_customize_sanitize_url( $value ) {
 }
 
 /**
+ * Clamp the Hero autoplay duration to the 3000-10000ms range the range
+ * control's input_attrs advertise, so a manually-crafted save request can't
+ * push it outside what js/hero.js's UI is built to support.
+ *
+ * @param mixed $value Raw value.
+ * @return int
+ */
+function dq_customize_sanitize_autoplay_duration( $value ) {
+	return max( 3000, min( 10000, absint( $value ) ) );
+}
+
+/**
  * Register every dq_theme_settings field as a native Customizer
  * panel/section/setting/control.
  *
  * @param WP_Customize_Manager $wp_customize
  */
 function dq_customize_register( $wp_customize ) {
+
+	require_once DQ_THEME_DIR . '/inc/class-dq-hero-frame-shape-control.php';
 
 	/**
 	 * =========================================================================
@@ -504,16 +518,72 @@ function dq_customize_register( $wp_customize ) {
 
 	/**
 	 * =========================================================================
+	 * Section: Pengaturan Carousel (dq_section_hero_carousel_settings) —
+	 * carousel-wide behavior (not tied to any one slide), shown above the 3
+	 * per-slide sections. Both settings support postMessage live preview:
+	 * js/hero.js restarts its autoplay timer when either changes (see the
+	 * wp.customize() bindings at the bottom of that file).
+	 * =========================================================================
+	 */
+	$wp_customize->add_section( 'dq_section_hero_carousel_settings', array(
+		'title'    => __( 'Pengaturan Carousel', 'dzurriyyatul-academic' ),
+		'panel'    => 'dq_panel_hero',
+		'priority' => -5,
+	) );
+
+	$wp_customize->add_setting( 'dq_theme_settings[hero_autoplay_enabled]', array(
+		'type'              => 'option',
+		'default'           => true,
+		'sanitize_callback' => 'rest_sanitize_boolean',
+		'transport'         => 'postMessage',
+	) );
+	$wp_customize->add_control( 'dq_theme_settings[hero_autoplay_enabled]', array(
+		'label'   => __( 'Aktifkan Putar Otomatis', 'dzurriyyatul-academic' ),
+		'section' => 'dq_section_hero_carousel_settings',
+		'type'    => 'checkbox',
+	) );
+
+	$wp_customize->add_setting( 'dq_theme_settings[hero_autoplay_duration]', array(
+		'type'              => 'option',
+		'default'           => 6000,
+		'sanitize_callback' => 'dq_customize_sanitize_autoplay_duration',
+		'transport'         => 'postMessage',
+	) );
+	$wp_customize->add_control( 'dq_theme_settings[hero_autoplay_duration]', array(
+		'label'       => __( 'Durasi Putar Otomatis (milidetik)', 'dzurriyyatul-academic' ),
+		'description' => __( 'Seberapa lama setiap slide tampil sebelum berganti otomatis.', 'dzurriyyatul-academic' ),
+		'section'     => 'dq_section_hero_carousel_settings',
+		'type'        => 'range',
+		'input_attrs' => array(
+			'min'  => 3000,
+			'max'  => 10000,
+			'step' => 500,
+		),
+	) );
+
+	/**
+	 * =========================================================================
 	 * Panel: Hero Slides — 3 sections (dq_section_hero_0..2), generated from a
-	 * single 26-field definition list looped over slide indices 0-2. Mirrors
-	 * dq_hero_slide_schema() / dq_hero_slide_defaults() field-for-field.
+	 * single field definition list looped over slide indices 0-2. Mirrors
+	 * dq_hero_slide_schema() / dq_hero_slide_defaults() field-for-field,
+	 * including the per-slide visibility, image position/zoom, and abstract
+	 * frame fields (each slide's frame is fully independent of the others —
+	 * the shape math itself lives in inc/hero-frame.php).
 	 * =========================================================================
 	 */
 
-	// Field definitions: key => [ type, label ]. Labels copied verbatim from
-	// the old dq_render_settings_page() "Hero Slides (3 Slide)" section;
-	// types copied verbatim from dq_hero_slide_schema().
+	// Field definitions: key => [ type, label, ... ]. Labels copied verbatim
+	// from the old dq_render_settings_page() "Hero Slides (3 Slide)" section
+	// where applicable; types copied verbatim from dq_hero_slide_schema().
+	// 'transport' defaults to 'refresh' when omitted — only fields the preview
+	// JS (js/hero.js, js/customizer-hero-frame-preview.js) actually knows how
+	// to patch live are marked 'postMessage'.
 	$dq_hero_fields = array(
+		'enabled'             => array(
+			'type'    => 'checkbox',
+			'label'   => __( 'Aktifkan Slide Ini', 'dzurriyyatul-academic' ),
+			'default' => true,
+		),
 		'tab_label'           => array( 'type' => 'text',     'label' => __( 'Label Tab (mis. Bimbingan Skripsi & Tesis)', 'dzurriyyatul-academic' ) ),
 		'badge_emoji'         => array( 'type' => 'text',     'label' => __( 'Emoji Badge', 'dzurriyyatul-academic' ) ),
 		'badge_text'          => array( 'type' => 'text',     'label' => __( 'Teks Badge', 'dzurriyyatul-academic' ) ),
@@ -528,6 +598,37 @@ function dq_customize_register( $wp_customize ) {
 		'secondary_cta_url'   => array( 'type' => 'url',      'label' => __( 'URL CTA Sekunder', 'dzurriyyatul-academic' ) ),
 		'image_id'            => array( 'type' => 'image',    'label' => __( 'Gambar Visual', 'dzurriyyatul-academic' ) ),
 		'image_alt'           => array( 'type' => 'text',     'label' => __( 'Teks Alternatif Gambar', 'dzurriyyatul-academic' ) ),
+		'image_position'      => array(
+			'type'      => 'select',
+			'label'     => __( 'Posisi Gambar (Fokus)', 'dzurriyyatul-academic' ),
+			'transport' => 'postMessage',
+			'default'   => 'center',
+			'choices'   => array(
+				'top left'     => __( 'Kiri Atas', 'dzurriyyatul-academic' ),
+				'top'          => __( 'Atas', 'dzurriyyatul-academic' ),
+				'top right'    => __( 'Kanan Atas', 'dzurriyyatul-academic' ),
+				'left'         => __( 'Kiri', 'dzurriyyatul-academic' ),
+				'center'       => __( 'Tengah', 'dzurriyyatul-academic' ),
+				'right'        => __( 'Kanan', 'dzurriyyatul-academic' ),
+				'bottom left'  => __( 'Kiri Bawah', 'dzurriyyatul-academic' ),
+				'bottom'       => __( 'Bawah', 'dzurriyyatul-academic' ),
+				'bottom right' => __( 'Kanan Bawah', 'dzurriyyatul-academic' ),
+			),
+		),
+		'image_zoom'          => array(
+			'type'      => 'select',
+			'label'     => __( 'Zoom Gambar', 'dzurriyyatul-academic' ),
+			'transport' => 'postMessage',
+			'default'   => '100',
+			'choices'   => array(
+				'100' => '100%',
+				'110' => '110%',
+				'120' => '120%',
+				'130' => '130%',
+				'140' => '140%',
+				'150' => '150%',
+			),
+		),
 		'caption_badge'       => array( 'type' => 'text',     'label' => __( 'Badge Kecil di Atas Gambar', 'dzurriyyatul-academic' ) ),
 		'caption_text'        => array( 'type' => 'text',     'label' => __( 'Teks Keterangan di Atas Gambar', 'dzurriyyatul-academic' ) ),
 		'quote_text'          => array( 'type' => 'textarea', 'label' => __( 'Kutipan Pendukung', 'dzurriyyatul-academic' ) ),
@@ -540,9 +641,61 @@ function dq_customize_register( $wp_customize ) {
 		'metric_2_label'      => array( 'type' => 'text',     'label' => __( 'Metrik 2 - Label', 'dzurriyyatul-academic' ) ),
 		'metric_3_value'      => array( 'type' => 'text',     'label' => __( 'Metrik 3 - Nilai', 'dzurriyyatul-academic' ) ),
 		'metric_3_label'      => array( 'type' => 'text',     'label' => __( 'Metrik 3 - Label', 'dzurriyyatul-academic' ) ),
+		'frame_enabled'       => array(
+			'type'      => 'checkbox',
+			'label'     => __( 'Aktifkan Bingkai Abstrak', 'dzurriyyatul-academic' ),
+			'transport' => 'postMessage',
+			'default'   => true,
+		),
+		'frame_shape'         => array(
+			'type'        => 'frame_shape',
+			'label'       => __( 'Gaya Bingkai', 'dzurriyyatul-academic' ),
+			'description' => __( 'Hanya sisi kiri gambar yang berbentuk abstrak — atas, kanan, dan bawah tetap lurus.', 'dzurriyyatul-academic' ),
+			'transport'   => 'postMessage',
+			'default'     => 'soft-wave',
+			'sanitize'    => 'dq_hero_frame_sanitize_shape',
+		),
+		'frame_intensity'     => array(
+			'type'      => 'select',
+			'label'     => __( 'Intensitas Lengkungan', 'dzurriyyatul-academic' ),
+			'transport' => 'postMessage',
+			'default'   => 'sedang',
+			'choices'   => array(
+				'ringan' => __( 'Ringan', 'dzurriyyatul-academic' ),
+				'sedang' => __( 'Sedang', 'dzurriyyatul-academic' ),
+				'kuat'   => __( 'Kuat', 'dzurriyyatul-academic' ),
+			),
+			'sanitize'  => 'dq_hero_frame_sanitize_intensity',
+		),
+		'frame_width'         => array(
+			'type'      => 'select',
+			'label'     => __( 'Lebar Jangkauan Bingkai', 'dzurriyyatul-academic' ),
+			'transport' => 'postMessage',
+			'default'   => 'sedang',
+			'choices'   => array(
+				'sempit' => __( 'Sempit', 'dzurriyyatul-academic' ),
+				'sedang' => __( 'Sedang', 'dzurriyyatul-academic' ),
+				'lebar'  => __( 'Lebar', 'dzurriyyatul-academic' ),
+			),
+			'sanitize'  => 'dq_hero_frame_sanitize_width',
+		),
+		'frame_position'      => array(
+			'type'      => 'select',
+			'label'     => __( 'Posisi Vertikal Lengkungan', 'dzurriyyatul-academic' ),
+			'transport' => 'postMessage',
+			'default'   => 'tengah',
+			'choices'   => array(
+				'atas'   => __( 'Atas', 'dzurriyyatul-academic' ),
+				'tengah' => __( 'Tengah', 'dzurriyyatul-academic' ),
+				'bawah'  => __( 'Bawah', 'dzurriyyatul-academic' ),
+			),
+			'sanitize'  => 'dq_hero_frame_sanitize_position',
+		),
 	);
 
-	// type => sanitize callback (reusing the dq_sanitize_by_type() wrappers).
+	// type => sanitize callback (reusing the dq_sanitize_by_type() wrappers),
+	// only used for the simple scalar types below — 'select'/'frame_shape'
+	// carry their own 'sanitize' callback per-field instead.
 	$dq_hero_sanitize_callbacks = array(
 		'text'     => 'dq_customize_sanitize_text',
 		'textarea' => 'dq_customize_sanitize_textarea',
@@ -572,13 +725,14 @@ function dq_customize_register( $wp_customize ) {
 		foreach ( $dq_hero_fields as $dq_field_key => $dq_field ) {
 
 			$dq_setting_id = "dq_theme_settings[hero_slides][{$dq_i}][{$dq_field_key}]";
+			$dq_transport  = isset( $dq_field['transport'] ) ? $dq_field['transport'] : 'refresh';
 
 			if ( 'image' === $dq_field['type'] ) {
 				$wp_customize->add_setting( $dq_setting_id, array(
 					'type'              => 'option',
 					'default'           => $dq_hero_default_values['image'],
 					'sanitize_callback' => $dq_hero_sanitize_callbacks['image'],
-					'transport'         => 'refresh',
+					'transport'         => $dq_transport,
 				) );
 
 				$wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, "dq_hero_{$dq_i}_image", array(
@@ -590,11 +744,77 @@ function dq_customize_register( $wp_customize ) {
 				continue;
 			}
 
+			if ( 'checkbox' === $dq_field['type'] ) {
+				$wp_customize->add_setting( $dq_setting_id, array(
+					'type'              => 'option',
+					'default'           => $dq_field['default'],
+					'sanitize_callback' => 'rest_sanitize_boolean',
+					'transport'         => $dq_transport,
+				) );
+
+				$wp_customize->add_control( $dq_setting_id, array(
+					'label'   => $dq_field['label'],
+					'section' => $dq_hero_section_id,
+					'type'    => 'checkbox',
+				) );
+
+				continue;
+			}
+
+			if ( 'select' === $dq_field['type'] ) {
+				// Fields that reuse an existing named whitelist sanitizer
+				// (the frame_* fields, validated against inc/hero-frame.php's
+				// own key sets) declare 'sanitize' explicitly; every other
+				// select field (image_position, image_zoom) falls back to a
+				// closure that whitelists against its own 'choices' here.
+				$dq_select_choices  = $dq_field['choices'];
+				$dq_select_default  = $dq_field['default'];
+				$dq_select_sanitize = isset( $dq_field['sanitize'] )
+					? $dq_field['sanitize']
+					: function ( $value ) use ( $dq_select_choices, $dq_select_default ) {
+						return array_key_exists( $value, $dq_select_choices ) ? $value : $dq_select_default;
+					};
+
+				$wp_customize->add_setting( $dq_setting_id, array(
+					'type'              => 'option',
+					'default'           => $dq_field['default'],
+					'sanitize_callback' => $dq_select_sanitize,
+					'transport'         => $dq_transport,
+				) );
+
+				$wp_customize->add_control( $dq_setting_id, array(
+					'label'   => $dq_field['label'],
+					'section' => $dq_hero_section_id,
+					'type'    => 'select',
+					'choices' => $dq_field['choices'],
+				) );
+
+				continue;
+			}
+
+			if ( 'frame_shape' === $dq_field['type'] && class_exists( 'DQ_Hero_Frame_Shape_Control' ) ) {
+				$wp_customize->add_setting( $dq_setting_id, array(
+					'type'              => 'option',
+					'default'           => $dq_field['default'],
+					'sanitize_callback' => $dq_field['sanitize'],
+					'transport'         => $dq_transport,
+				) );
+
+				$wp_customize->add_control( new DQ_Hero_Frame_Shape_Control( $wp_customize, "dq_hero_{$dq_i}_frame_shape", array(
+					'label'       => $dq_field['label'],
+					'description' => $dq_field['description'],
+					'section'     => $dq_hero_section_id,
+					'settings'    => $dq_setting_id,
+				) ) );
+
+				continue;
+			}
+
 			$wp_customize->add_setting( $dq_setting_id, array(
 				'type'              => 'option',
 				'default'           => $dq_hero_default_values[ $dq_field['type'] ],
 				'sanitize_callback' => $dq_hero_sanitize_callbacks[ $dq_field['type'] ],
-				'transport'         => 'refresh',
+				'transport'         => $dq_transport,
 			) );
 
 			$wp_customize->add_control( $dq_setting_id, array(

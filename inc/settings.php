@@ -46,6 +46,8 @@ function dq_settings_schema() {
 		'legal_note'              => 'textarea',
 		'about_page_url'          => 'url',
 		'seo_default_description' => 'textarea',
+		'hero_autoplay_enabled'    => 'checkbox',
+		'hero_autoplay_duration'   => 'number',
 		'integrity_eyebrow_text'   => 'text',
 		'integrity_heading'        => 'text',
 		'integrity_notice_text'    => 'textarea',
@@ -68,6 +70,7 @@ function dq_settings_schema() {
  */
 function dq_hero_slide_schema() {
 	return array(
+		'enabled'             => 'checkbox',
 		'tab_label'           => 'text',
 		'badge_emoji'         => 'text',
 		'badge_text'          => 'text',
@@ -82,6 +85,8 @@ function dq_hero_slide_schema() {
 		'secondary_cta_url'   => 'url',
 		'image_id'            => 'image',
 		'image_alt'           => 'text',
+		'image_position'      => 'text',
+		'image_zoom'          => 'text',
 		'caption_badge'       => 'text',
 		'caption_text'        => 'text',
 		'quote_text'          => 'textarea',
@@ -94,6 +99,11 @@ function dq_hero_slide_schema() {
 		'metric_2_label'      => 'text',
 		'metric_3_value'      => 'text',
 		'metric_3_label'      => 'text',
+		'frame_enabled'       => 'checkbox',
+		'frame_shape'         => 'text',
+		'frame_intensity'     => 'text',
+		'frame_width'         => 'text',
+		'frame_position'      => 'text',
 	);
 }
 
@@ -126,6 +136,10 @@ function dq_sanitize_by_type( $raw, $type ) {
 			return esc_url_raw( trim( (string) $raw ) );
 		case 'image':
 			return absint( $raw );
+		case 'checkbox':
+			return rest_sanitize_boolean( $raw );
+		case 'number':
+			return absint( $raw );
 		default:
 			return sanitize_text_field( $raw );
 	}
@@ -144,19 +158,36 @@ function dq_sanitize_theme_settings( $input ) {
 		return $clean;
 	}
 
+	// Non-blank fallbacks for fields whose correct "not yet saved" default
+	// isn't an empty string — e.g. a field introduced in a theme update that
+	// an older stored dq_theme_settings option simply doesn't have a key for
+	// yet. Without this, saving ANY unrelated field (this function rebuilds
+	// the whole option on every save) would write '' for these, which
+	// wp_parse_args() in dq_get_hero_slide()/dq_get_setting() then treats as
+	// an explicit false/empty rather than falling through to the real
+	// default — silently disabling every slide's frame/visibility on the
+	// first Customizer save after an update.
+	$flat_defaults = array(
+		'hero_autoplay_enabled'  => true,
+		'hero_autoplay_duration' => 6000,
+	);
+
 	foreach ( dq_settings_schema() as $key => $type ) {
-		$clean[ $key ] = isset( $input[ $key ] ) ? dq_sanitize_by_type( $input[ $key ], $type ) : '';
+		$default       = isset( $flat_defaults[ $key ] ) ? $flat_defaults[ $key ] : '';
+		$clean[ $key ] = isset( $input[ $key ] ) ? dq_sanitize_by_type( $input[ $key ], $type ) : $default;
 	}
 
 	$clean['hero_slides'] = array();
 	$slide_schema         = dq_hero_slide_schema();
+	$slide_defaults       = dq_hero_slide_defaults();
 
 	for ( $i = 0; $i < 3; $i++ ) {
 		$slide       = isset( $input['hero_slides'][ $i ] ) && is_array( $input['hero_slides'][ $i ] ) ? $input['hero_slides'][ $i ] : array();
 		$clean_slide = array();
 
 		foreach ( $slide_schema as $key => $type ) {
-			$clean_slide[ $key ] = isset( $slide[ $key ] ) ? dq_sanitize_by_type( $slide[ $key ], $type ) : '';
+			$default             = isset( $slide_defaults[ $key ] ) ? $slide_defaults[ $key ] : '';
+			$clean_slide[ $key ] = isset( $slide[ $key ] ) ? dq_sanitize_by_type( $slide[ $key ], $type ) : $default;
 		}
 
 		$clean['hero_slides'][] = $clean_slide;

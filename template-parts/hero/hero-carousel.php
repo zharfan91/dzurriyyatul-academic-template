@@ -3,8 +3,9 @@
  * Hero carousel — 3 slides driven entirely by Theme Settings.
  *
  * Preserves the approved Stitch interaction: tab switcher + arrow controls
- * + dot indicators + counter + 7s autoplay (js/hero.js), with full keyboard
- * support and prefers-reduced-motion handling (§25–§26).
+ * + dot indicators + counter + autoplay (js/hero.js, duration/enable set per
+ * Appearance → Customize → Hero Slides → Pengaturan Carousel), with full
+ * keyboard support and prefers-reduced-motion handling (§25–§26).
  *
  * @package DzurriyyatulAcademic
  */
@@ -16,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $slides = array();
 for ( $i = 0; $i < 3; $i++ ) {
 	$slide = dq_get_hero_slide( $i );
-	if ( '' !== trim( $slide['heading_line1'] ) ) {
+	if ( '' !== trim( $slide['heading_line1'] ) && $slide['enabled'] ) {
 		$slides[ $i ] = $slide;
 	}
 }
@@ -56,11 +57,12 @@ if ( empty( $slides ) ) {
 	return;
 }
 
-$total = count( $slides );
-$hero_frame_enabled = dq_hero_frame_settings()['enabled'];
+$total             = count( $slides );
+$autoplay_enabled  = (bool) dq_get_setting( 'hero_autoplay_enabled', true );
+$autoplay_duration = absint( dq_get_setting( 'hero_autoplay_duration', 6000 ) );
 ?>
-<section class="academic-hero<?php echo $hero_frame_enabled ? ' academic-hero--frame-enabled' : ''; ?>" id="beranda" aria-roledescription="carousel" aria-label="<?php esc_attr_e( 'Sorotan Program', 'dzurriyyatul-academic' ); ?>">
-	<?php dq_hero_frame_render_clip_path(); ?>
+<section class="academic-hero" id="beranda" aria-roledescription="carousel" aria-label="<?php esc_attr_e( 'Sorotan Program', 'dzurriyyatul-academic' ); ?>">
+	<?php dq_hero_frame_render_clip_paths( $slides ); ?>
 	<div class="academic-hero__pattern" aria-hidden="true"></div>
 
 	<div class="academic-container academic-hero__tabbar">
@@ -86,7 +88,7 @@ $hero_frame_enabled = dq_hero_frame_settings()['enabled'];
 		<?php endif; ?>
 	</div>
 
-	<div class="academic-hero__stage" id="heroCarouselStage" data-autoplay="<?php echo esc_attr( $total > 1 ? '7000' : '0' ); ?>">
+	<div class="academic-hero__stage" id="heroCarouselStage" data-autoplay="<?php echo esc_attr( $autoplay_duration ); ?>" data-autoplay-enabled="<?php echo esc_attr( $total > 1 && $autoplay_enabled ? '1' : '0' ); ?>">
 		<?php $n = 0; foreach ( $slides as $index => $slide ) :
 			$primary_url   = dq_whatsapp_url( '' !== $slide['primary_cta_message'] ? $slide['primary_cta_message'] : '' );
 			$tags          = dq_csv_to_array( $slide['tags'] );
@@ -156,8 +158,18 @@ $hero_frame_enabled = dq_hero_frame_settings()['enabled'];
 
 					<div class="academic-hero__visual">
 						<div class="academic-hero__visual-card">
+							<?php
+							$slide_frame_enabled = ! empty( $slide['frame_enabled'] );
+							$image_frame_class   = 'academic-hero__image-frame' . ( $slide_frame_enabled ? ' academic-hero__image-frame--frame-enabled' : '' );
+							$image_frame_style   = $slide_frame_enabled ? ' style="clip-path:url(#dq-hero-frame-clip-' . esc_attr( $index ) . ')"' : '';
+							$image_style         = sprintf(
+								'object-position:%s;transform:scale(%s);',
+								esc_attr( $slide['image_position'] ),
+								esc_attr( (float) $slide['image_zoom'] / 100 )
+							);
+							?>
 							<?php if ( $slide['image_id'] ) : ?>
-								<div class="academic-hero__image-frame">
+								<div class="<?php echo esc_attr( $image_frame_class ); ?>"<?php echo $image_frame_style; // phpcs:ignore -- built above from esc_attr()'d values, not raw input. ?>>
 									<?php
 									echo wp_get_attachment_image(
 										$slide['image_id'],
@@ -165,6 +177,7 @@ $hero_frame_enabled = dq_hero_frame_settings()['enabled'];
 										false,
 										array(
 											'class'        => 'academic-hero__image',
+											'style'        => $image_style,
 											'alt'          => esc_attr( $slide['image_alt'] ),
 											'fetchpriority'=> 0 === $n ? 'high' : 'low',
 											'loading'      => 0 === $n ? 'eager' : 'lazy',

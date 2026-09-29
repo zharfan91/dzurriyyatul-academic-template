@@ -1,7 +1,8 @@
 /**
- * Reload-free Customizer preview for the Hero image's abstract frame.
- * Mirrors dq_hero_frame_build_path() (inc/hero-frame.php) exactly, so the
- * live preview always matches what gets rendered server-side after Publish.
+ * Reload-free Customizer preview for each Hero slide's independent abstract
+ * frame, image position, and image zoom. The path-building math mirrors
+ * dq_hero_frame_build_path() (inc/hero-frame.php) exactly, so the live
+ * preview always matches what gets rendered server-side after Publish.
  * Runs inside the preview iframe (enqueued via customize_preview_init with
  * the 'customize-preview' dependency, which provides wp.customize here).
  */
@@ -80,40 +81,70 @@
 		return setting ? setting.get() : fallback;
 	}
 
-	function applyFrame() {
-		var enabled = !! currentValue( 'dq_hero_frame_enabled', true );
-		var shape = currentValue( 'dq_hero_frame_shape', 'soft-wave' );
-		var intensity = currentValue( 'dq_hero_frame_intensity', 'sedang' );
-		var width = currentValue( 'dq_hero_frame_width', 'sedang' );
-		var position = currentValue( 'dq_hero_frame_position', 'tengah' );
+	function slideSettingId( index, field ) {
+		return 'dq_theme_settings[hero_slides][' + index + '][' + field + ']';
+	}
 
-		document.querySelectorAll( '.academic-hero' ).forEach( function ( hero ) {
-			hero.classList.toggle( 'academic-hero--frame-enabled', enabled );
-		} );
+	function applyFrame( index ) {
+		var slideEl = document.getElementById( 'hero-slide-' + index );
+		var frameEl = slideEl && slideEl.querySelector( '.academic-hero__image-frame' );
 
-		if ( ! enabled ) {
+		if ( ! frameEl ) {
 			return;
 		}
 
-		var pathEl = document.getElementById( 'dq-hero-frame-clip-path' );
+		var enabled = !! currentValue( slideSettingId( index, 'frame_enabled' ), true );
+		var shape = currentValue( slideSettingId( index, 'frame_shape' ), 'soft-wave' );
+		var intensity = currentValue( slideSettingId( index, 'frame_intensity' ), 'sedang' );
+		var width = currentValue( slideSettingId( index, 'frame_width' ), 'sedang' );
+		var position = currentValue( slideSettingId( index, 'frame_position' ), 'tengah' );
+
+		frameEl.classList.toggle( 'academic-hero__image-frame--frame-enabled', enabled );
+		frameEl.style.clipPath = enabled ? 'url(#dq-hero-frame-clip-' + index + ')' : '';
+
+		var pathEl = document.getElementById( 'dq-hero-frame-clip-path-' + index );
 		if ( pathEl ) {
 			pathEl.setAttribute( 'd', buildPath( shape, intensity, width, position ) );
 		}
 	}
 
-	wp.customize.bind( 'preview-ready', function () {
-		[
-			'dq_hero_frame_enabled',
-			'dq_hero_frame_shape',
-			'dq_hero_frame_intensity',
-			'dq_hero_frame_width',
-			'dq_hero_frame_position',
-		].forEach( function ( settingId ) {
-			wp.customize( settingId, function ( value ) {
-				value.bind( applyFrame );
-			} );
-		} );
+	function applyImageStyle( index ) {
+		var slideEl = document.getElementById( 'hero-slide-' + index );
+		var imgEl = slideEl && slideEl.querySelector( '.academic-hero__image' );
 
-		applyFrame();
+		if ( ! imgEl ) {
+			return;
+		}
+
+		var position = currentValue( slideSettingId( index, 'image_position' ), 'center' );
+		var zoom = parseFloat( currentValue( slideSettingId( index, 'image_zoom' ), '100' ) ) || 100;
+
+		imgEl.style.objectPosition = position;
+		imgEl.style.transform = 'scale(' + ( zoom / 100 ) + ')';
+	}
+
+	wp.customize.bind( 'preview-ready', function () {
+		for ( var i = 0; i < 3; i++ ) {
+			( function ( index ) {
+				[ 'frame_enabled', 'frame_shape', 'frame_intensity', 'frame_width', 'frame_position' ].forEach( function ( field ) {
+					wp.customize( slideSettingId( index, field ), function ( value ) {
+						value.bind( function () {
+							applyFrame( index );
+						} );
+					} );
+				} );
+
+				[ 'image_position', 'image_zoom' ].forEach( function ( field ) {
+					wp.customize( slideSettingId( index, field ), function ( value ) {
+						value.bind( function () {
+							applyImageStyle( index );
+						} );
+					} );
+				} );
+
+				applyFrame( index );
+				applyImageStyle( index );
+			} )( i );
+		}
 	} );
 } )( window.wp );

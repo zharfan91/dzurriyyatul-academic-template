@@ -39,8 +39,15 @@ function dq_enqueue_assets() {
 	wp_enqueue_style( 'dq-sections', DQ_THEME_URI . '/assets/css/sections.css', array( 'dq-components' ), DQ_THEME_VERSION );
 	wp_enqueue_style( 'dq-responsive', DQ_THEME_URI . '/assets/css/responsive.css', array( 'dq-sections' ), DQ_THEME_VERSION );
 
+	// Inside the Customizer preview iframe, hero.js binds wp.customize() to
+	// react live to the autoplay settings (see the bottom of js/hero.js) —
+	// declaring the dependency here guarantees 'customize-preview' (which
+	// WordPress core enqueues for the preview iframe) has already loaded and
+	// defined window.wp.customize by the time hero.js runs.
+	$dq_hero_deps = is_customize_preview() ? array( 'customize-preview' ) : array();
+
 	wp_enqueue_script( 'dq-navigation', DQ_THEME_URI . '/js/navigation.js', array(), DQ_THEME_VERSION, true );
-	wp_enqueue_script( 'dq-hero', DQ_THEME_URI . '/js/hero.js', array(), DQ_THEME_VERSION, true );
+	wp_enqueue_script( 'dq-hero', DQ_THEME_URI . '/js/hero.js', $dq_hero_deps, DQ_THEME_VERSION, true );
 	wp_enqueue_script( 'dq-faq', DQ_THEME_URI . '/js/faq.js', array(), DQ_THEME_VERSION, true );
 	wp_enqueue_script( 'dq-main', DQ_THEME_URI . '/js/main.js', array(), DQ_THEME_VERSION, true );
 

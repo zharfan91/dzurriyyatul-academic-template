@@ -1,6 +1,8 @@
 /**
- * Hero carousel: tab/dot/arrow controls, keyboard navigation, 7s autoplay,
- * pause on hover/focus, and a prefers-reduced-motion escape hatch (§25-26).
+ * Hero carousel: tab/dot/arrow controls, keyboard navigation, autoplay
+ * (enable + duration set via Appearance → Customize → Hero Slides →
+ * Pengaturan Carousel), pause on hover/focus, and a prefers-reduced-motion
+ * escape hatch (§25-26).
  */
 ( function () {
 	'use strict';
@@ -24,7 +26,8 @@
 
 	var current = 0;
 	var timer = null;
-	var intervalTime = parseInt( stage.getAttribute( 'data-autoplay' ), 10 ) || 7000;
+	var intervalTime = parseInt( stage.getAttribute( 'data-autoplay' ), 10 ) || 6000;
+	var autoplayEnabled = '0' !== stage.getAttribute( 'data-autoplay-enabled' );
 	var reduceMotion = window.matchMedia && window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
 	function show( index ) {
@@ -58,10 +61,14 @@
 	}
 
 	function start() {
-		if ( reduceMotion ) {
+		// Always clear any running timer first (not just when the guard below
+		// passes) so a live Customizer-preview toggle from enabled to disabled
+		// — which calls start() again to apply the change — actually stops
+		// the interval instead of merely skipping the creation of a new one.
+		stop();
+		if ( reduceMotion || ! autoplayEnabled ) {
 			return;
 		}
-		stop();
 		timer = window.setInterval( function () {
 			show( current + 1 );
 		}, intervalTime );
@@ -119,4 +126,26 @@
 
 	show( 0 );
 	start();
+
+	// Reload-free Customizer preview: when running inside the preview iframe
+	// (Appearance → Customize → Hero Slides → Pengaturan Carousel), react to
+	// the autoplay enable/duration settings changing and restart the timer
+	// with the new value instead of waiting for a full iframe refresh.
+	if ( window.wp && window.wp.customize ) {
+		wp.customize.bind( 'preview-ready', function () {
+			wp.customize( 'dq_theme_settings[hero_autoplay_enabled]', function ( value ) {
+				value.bind( function ( newValue ) {
+					autoplayEnabled = !! newValue;
+					start();
+				} );
+			} );
+
+			wp.customize( 'dq_theme_settings[hero_autoplay_duration]', function ( value ) {
+				value.bind( function ( newValue ) {
+					intervalTime = parseInt( newValue, 10 ) || 6000;
+					start();
+				} );
+			} );
+		} );
+	}
 } )();

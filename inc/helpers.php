@@ -95,6 +95,7 @@ function dq_get_hero_slide( $index ) {
  */
 function dq_hero_slide_defaults() {
 	return array(
+		'enabled'            => true,
 		'tab_label'          => '',
 		'badge_emoji'        => '',
 		'badge_text'         => '',
@@ -109,6 +110,8 @@ function dq_hero_slide_defaults() {
 		'secondary_cta_url'  => '',
 		'image_id'           => 0,
 		'image_alt'          => '',
+		'image_position'     => 'center',
+		'image_zoom'         => '100',
 		'caption_badge'      => '',
 		'caption_text'       => '',
 		'quote_text'         => '',
@@ -121,6 +124,11 @@ function dq_hero_slide_defaults() {
 		'metric_2_label'     => '',
 		'metric_3_value'     => '',
 		'metric_3_label'     => '',
+		'frame_enabled'      => true,
+		'frame_shape'        => 'soft-wave',
+		'frame_intensity'    => 'sedang',
+		'frame_width'        => 'sedang',
+		'frame_position'     => 'tengah',
 	);
 }
 

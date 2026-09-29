@@ -354,13 +354,15 @@
 	aspect-ratio: 4 / 3;
 }
 
-/* Abstract left-edge frame (Appearance > Customize > Hero Slides > Bingkai
-   Gambar Hero) — an on/off enhancement layered on top of the image frame
-   above. Top/right/bottom edges stay straight by construction: the clip
-   path itself only bends along the left edge (see inc/hero-frame.php). */
-.academic-hero--frame-enabled .academic-hero__image-frame {
+/* Abstract left-edge frame (Appearance > Customize > Hero Slides > per-slide
+   "Bingkai Gambar Hero" fields) — an on/off enhancement layered on top of
+   the image frame above, independent per slide. Top/right/bottom edges stay
+   straight by construction: the clip path itself only bends along the left
+   edge (see inc/hero-frame.php). The clip-path URL itself (which of the 3
+   per-slide <clipPath> ids to use) is set as an inline style in
+   template-parts/hero/hero-carousel.php, since it differs per slide. */
+.academic-hero__image-frame--frame-enabled {
 	border-radius: 0;
-	clip-path: url(#dq-hero-frame-clip);
 }
 
 .academic-hero__image-frame::after {

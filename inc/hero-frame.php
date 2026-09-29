@@ -8,8 +8,13 @@
  * correctly to any image size — the reason this uses an SVG <clipPath>
  * rather than CSS clip-path: path(), which has no percentage-unit support).
  *
- * One shared clipPath is applied globally to every hero slide's image (not
- * per-slide) — the request describes a single frame configuration, not 3.
+ * Each of the 3 hero slides has its OWN independent frame configuration
+ * (enable/shape/intensity/width/position), stored alongside that slide's
+ * other fields in dq_theme_settings[hero_slides][$i][...] — registered as
+ * part of the main per-slide field loop in inc/customizer.php, not as a
+ * separate global theme_mod section. This file keeps the shape math (proven
+ * correct against a PHP/JS cross-validation harness) plus the per-slide
+ * clip-path rendering and the sanitize callbacks the Customizer controls use.
  *
  * @package DzurriyyatulAcademic
  */
@@ -197,40 +202,50 @@ function dq_hero_frame_build_path( $shape_key, $intensity_key, $width_key, $posi
 }
 
 /**
- * Current frame settings, each backed by get_theme_mod() per the spec.
+ * Extract one slide's frame settings from its already-fetched
+ * dq_get_hero_slide() array (frame fields live alongside the slide's other
+ * content, not in a separate global store).
  *
+ * @param array $slide A slide array as returned by dq_get_hero_slide().
  * @return array{enabled:bool,shape:string,intensity:string,width:string,position:string}
  */
-function dq_hero_frame_settings() {
+function dq_hero_frame_settings_for_slide( $slide ) {
 	return array(
-		'enabled'   => (bool) get_theme_mod( 'dq_hero_frame_enabled', true ),
-		'shape'     => get_theme_mod( 'dq_hero_frame_shape', 'soft-wave' ),
-		'intensity' => get_theme_mod( 'dq_hero_frame_intensity', 'sedang' ),
-		'width'     => get_theme_mod( 'dq_hero_frame_width', 'sedang' ),
-		'position'  => get_theme_mod( 'dq_hero_frame_position', 'tengah' ),
+		'enabled'   => (bool) $slide['frame_enabled'],
+		'shape'     => $slide['frame_shape'],
+		'intensity' => $slide['frame_intensity'],
+		'width'     => $slide['frame_width'],
+		'position'  => $slide['frame_position'],
 	);
 }
 
 /**
- * Render the shared <svg><clipPath> once. Call from hero-carousel.php right
- * before the slides markup; every slide's .academic-hero__image-frame
- * references it via CSS (assets/css/sections.css:
- * .academic-hero--frame-enabled .academic-hero__image-frame).
+ * Render one shared <svg><defs> holding one <clipPath> PER hero slide index
+ * (0-2), each with its own path built from that slide's independent frame
+ * settings. Call from hero-carousel.php right before the slides markup.
+ *
+ * Every index gets a clipPath regardless of that slide's enabled state (even
+ * disabled ones), so postMessage live preview in the Customizer can flip a
+ * slide's frame on without needing to create SVG nodes on the fly — see
+ * js/customizer-hero-frame-preview.js.
+ *
+ * @param array<int,array> $slides Slide arrays keyed by index, as built in
+ *                                 hero-carousel.php.
  */
-function dq_hero_frame_render_clip_path() {
-	$settings = dq_hero_frame_settings();
-
-	if ( ! $settings['enabled'] ) {
-		return;
-	}
-
-	$d = dq_hero_frame_build_path( $settings['shape'], $settings['intensity'], $settings['width'], $settings['position'] );
+function dq_hero_frame_render_clip_paths( $slides ) {
 	?>
 	<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;">
 		<defs>
-			<clipPath id="dq-hero-frame-clip" clipPathUnits="objectBoundingBox">
-				<path d="<?php echo esc_attr( $d ); ?>" id="dq-hero-frame-clip-path"></path>
-			</clipPath>
+			<?php for ( $i = 0; $i < 3; $i++ ) : ?>
+				<?php
+				$slide    = isset( $slides[ $i ] ) ? $slides[ $i ] : dq_hero_slide_defaults();
+				$settings = dq_hero_frame_settings_for_slide( $slide );
+				$d        = dq_hero_frame_build_path( $settings['shape'], $settings['intensity'], $settings['width'], $settings['position'] );
+				?>
+				<clipPath id="dq-hero-frame-clip-<?php echo esc_attr( $i ); ?>" clipPathUnits="objectBoundingBox">
+					<path d="<?php echo esc_attr( $d ); ?>" id="dq-hero-frame-clip-path-<?php echo esc_attr( $i ); ?>"></path>
+				</clipPath>
+			<?php endfor; ?>
 		</defs>
 	</svg>
 	<?php
@@ -283,105 +298,12 @@ function dq_hero_frame_sanitize_position( $value ) {
 }
 
 /**
- * Register the "Bingkai Gambar Hero" Customizer section under the existing
- * Hero Slides panel, plus all 5 theme_mod settings + controls. Every
- * setting uses transport => 'postMessage' with the JS in
- * assets/js/customizer-hero-frame-preview.js doing the reload-free preview
- * update (see dq_hero_frame_enqueue_preview_script()).
- *
- * @param WP_Customize_Manager $wp_customize
+ * The 5 frame controls (enable/shape/intensity/width/position) are
+ * registered per-slide as part of the main Hero Slides field loop in
+ * inc/customizer.php (each slide gets its own independent frame section),
+ * not here — this file only supplies the shape math + sanitize callbacks
+ * that loop uses, and the shared rendering/preview plumbing below.
  */
-function dq_customize_register_hero_frame( $wp_customize ) {
-	require_once DQ_THEME_DIR . '/inc/class-dq-hero-frame-shape-control.php';
-
-	$wp_customize->add_section( 'dq_section_hero_frame', array(
-		'title'    => __( 'Bingkai Gambar Hero', 'dzurriyyatul-academic' ),
-		'panel'    => 'dq_panel_hero',
-		'priority' => 30,
-	) );
-
-	$wp_customize->add_setting( 'dq_hero_frame_enabled', array(
-		'type'              => 'theme_mod',
-		'default'           => true,
-		'sanitize_callback' => 'rest_sanitize_boolean',
-		'transport'         => 'postMessage',
-	) );
-	$wp_customize->add_control( 'dq_hero_frame_enabled', array(
-		'label'   => __( 'Aktifkan Bingkai Abstrak', 'dzurriyyatul-academic' ),
-		'section' => 'dq_section_hero_frame',
-		'type'    => 'checkbox',
-	) );
-
-	if ( class_exists( 'DQ_Hero_Frame_Shape_Control' ) ) {
-		$wp_customize->add_setting( 'dq_hero_frame_shape', array(
-			'type'              => 'theme_mod',
-			'default'           => 'soft-wave',
-			'sanitize_callback' => 'dq_hero_frame_sanitize_shape',
-			'transport'         => 'postMessage',
-		) );
-		$wp_customize->add_control( new DQ_Hero_Frame_Shape_Control(
-			$wp_customize,
-			'dq_hero_frame_shape',
-			array(
-				'label'       => __( 'Gaya Bingkai', 'dzurriyyatul-academic' ),
-				'description' => __( 'Hanya sisi kiri gambar yang berbentuk abstrak — atas, kanan, dan bawah tetap lurus.', 'dzurriyyatul-academic' ),
-				'section'     => 'dq_section_hero_frame',
-			)
-		) );
-	}
-
-	$wp_customize->add_setting( 'dq_hero_frame_intensity', array(
-		'type'              => 'theme_mod',
-		'default'           => 'sedang',
-		'sanitize_callback' => 'dq_hero_frame_sanitize_intensity',
-		'transport'         => 'postMessage',
-	) );
-	$wp_customize->add_control( 'dq_hero_frame_intensity', array(
-		'label'   => __( 'Intensitas Lengkungan', 'dzurriyyatul-academic' ),
-		'section' => 'dq_section_hero_frame',
-		'type'    => 'select',
-		'choices' => array(
-			'ringan' => __( 'Ringan', 'dzurriyyatul-academic' ),
-			'sedang' => __( 'Sedang', 'dzurriyyatul-academic' ),
-			'kuat'   => __( 'Kuat', 'dzurriyyatul-academic' ),
-		),
-	) );
-
-	$wp_customize->add_setting( 'dq_hero_frame_width', array(
-		'type'              => 'theme_mod',
-		'default'           => 'sedang',
-		'sanitize_callback' => 'dq_hero_frame_sanitize_width',
-		'transport'         => 'postMessage',
-	) );
-	$wp_customize->add_control( 'dq_hero_frame_width', array(
-		'label'   => __( 'Lebar Jangkauan Bingkai', 'dzurriyyatul-academic' ),
-		'section' => 'dq_section_hero_frame',
-		'type'    => 'select',
-		'choices' => array(
-			'sempit' => __( 'Sempit', 'dzurriyyatul-academic' ),
-			'sedang' => __( 'Sedang', 'dzurriyyatul-academic' ),
-			'lebar'  => __( 'Lebar', 'dzurriyyatul-academic' ),
-		),
-	) );
-
-	$wp_customize->add_setting( 'dq_hero_frame_position', array(
-		'type'              => 'theme_mod',
-		'default'           => 'tengah',
-		'sanitize_callback' => 'dq_hero_frame_sanitize_position',
-		'transport'         => 'postMessage',
-	) );
-	$wp_customize->add_control( 'dq_hero_frame_position', array(
-		'label'   => __( 'Posisi Vertikal Lengkungan', 'dzurriyyatul-academic' ),
-		'section' => 'dq_section_hero_frame',
-		'type'    => 'select',
-		'choices' => array(
-			'atas'   => __( 'Atas', 'dzurriyyatul-academic' ),
-			'tengah' => __( 'Tengah', 'dzurriyyatul-academic' ),
-			'bawah'  => __( 'Bawah', 'dzurriyyatul-academic' ),
-		),
-	) );
-}
-add_action( 'customize_register', 'dq_customize_register_hero_frame' );
 
 /**
  * Enqueue the visual shape-picker's grid/thumbnail CSS on the Customizer
@@ -394,9 +316,10 @@ add_action( 'customize_controls_enqueue_scripts', 'dq_hero_frame_enqueue_control
 
 /**
  * Reload-free live preview: mirrors dq_hero_frame_build_path() in JS and
- * rewrites the clip-path <path> element's "d" attribute directly whenever
- * any of the 5 settings changes in the Customizer, instead of refreshing
- * the whole preview iframe.
+ * rewrites each slide's clip-path <path> element's "d" attribute directly
+ * whenever any of that slide's frame settings changes in the Customizer
+ * (and likewise for image position/zoom), instead of refreshing the whole
+ * preview iframe. See js/customizer-hero-frame-preview.js.
  */
 function dq_hero_frame_enqueue_preview_script() {
 	wp_enqueue_script(
