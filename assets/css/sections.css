@@ -153,16 +153,9 @@
 	animation: none !important;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.academic-hero__slide,
-	.academic-hero__slide.is-active {
-		transition: none;
-	}
-
-	.academic-hero__slide * {
-		animation: none !important;
-	}
-}
+/* Deliberately NOT disabled for prefers-reduced-motion (site owner's
+   choice): use Jenis Animasi → "Tanpa animasi" in the Customizer to turn
+   the slide effect off for everyone. */
 
 /* --- Text column ---------------------------------------------------------*/
 /* width: 100% — inside the flex-column slide, .academic-container's

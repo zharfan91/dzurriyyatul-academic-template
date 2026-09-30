@@ -1,9 +1,8 @@
 /**
  * Hero carousel: dot indicator + counter, previous/next, arrow
  * keys, touch swipe, autoplay (Customizer → Hero Slides → Pengaturan
- * Carousel) paused on hover/focus. Autoplay also runs for
- * prefers-reduced-motion visitors (by request); for them sections.css
- * switches slides instantly instead of animating.
+ * Carousel) paused on hover/focus. Autoplay and the slide effect run for
+ * every visitor, including prefers-reduced-motion (site owner's choice).
  *
  * initHero() is re-run whenever the Customizer's selective refresh
  * re-renders the hero, so preview changes never leave a stale timer behind.
