@@ -1,6 +1,6 @@
 <?php
 /**
- * Header: doctype, <head>, skip link, announcement bar, navigation.
+ * Header: doctype, <head>, skip link, navigation.
  *
  * @package DzurriyyatulAcademic
  */
@@ -22,5 +22,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 <a class="academic-skip-link" href="#main-content"><?php esc_html_e( 'Lewati ke konten utama', 'dzurriyyatul-academic' ); ?></a>
 
 <?php
-get_template_part( 'template-parts/header/announcement-bar' );
 get_template_part( 'template-parts/header/navigation' );

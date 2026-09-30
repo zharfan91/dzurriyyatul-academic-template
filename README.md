@@ -83,7 +83,7 @@ Sebelum situs tayang (go-live), pastikan:
 | Testimoni | CPT **Testimoni** | Rating 1–5; kolom konten = isi kutipan testimoni |
 | FAQ | CPT **FAQ** | Kolom konten = isi jawaban; tampil sebagai accordion yang aksesibel |
 | Artikel | Pos WordPress standar | Memakai `archive.php` / `single.php` |
-| Legal/kontak/sosial | Appearance → Customize → Pengaturan Situs Akademik | Menyuplai announcement bar, banner legalitas, dan footer |
+| Legal/kontak/sosial | Appearance → Customize → Pengaturan Situs Akademik | Menyuplai banner legalitas dan footer |
 | Logo/Favicon/Judul situs | Appearance → Customize → Site Identity | Bawaan WordPress, tidak diduplikasi |
 
 Kelima custom post type mendukung kotak **Order** bawaan WordPress yang bisa diurutkan lewat drag-and-drop (via `page-attributes`), sehingga tidak diperlukan antarmuka pengurutan khusus.

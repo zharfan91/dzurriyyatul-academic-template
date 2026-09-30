@@ -47,7 +47,6 @@ Design-to-WordPress mapping:
 
 ```
 STITCH COMPONENT              → WP COMPONENT           → TEMPLATE PART                          → DATA SOURCE
-Announcement bar               Template part            template-parts/header/announcement-bar   Theme Settings (options)
 Main nav + mobile drawer       Template part + wp_nav_menu fallback  template-parts/header/navigation  Theme Settings + nav_menu('primary')
 Hero carousel                  Template part + JS module template-parts/hero/hero-carousel.php     Theme Settings (3 hero slide groups)
 Value pillars                  Template part (static, editable via filter)  template-parts/trust/value-pillars.php  Constants + filter hook
@@ -82,7 +81,6 @@ dzurriyyatul-academic/
 │   ├── template-functions.php     body_class hooks, nav fallback, pagination, breadcrumb
 │   └── consultation-form.php      Nonce-protected AJAX handler for the consultation form
 ├── template-parts/
-│   ├── header/announcement-bar.php
 │   ├── header/navigation.php
 │   ├── hero/hero-carousel.php
 │   ├── trust/value-pillars.php

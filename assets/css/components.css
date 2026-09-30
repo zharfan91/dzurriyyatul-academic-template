@@ -303,51 +303,7 @@
 	border-color: var(--color-primary);
 }
 
-/* Header / Announcement bar -------------------------------------------- */
-.academic-announcement {
-	background: var(--color-primary-dark);
-	color: #d1fae5;
-	font-size: var(--text-body-sm-size);
-	padding-block: var(--space-sm);
-}
-
-.academic-announcement__row {
-	display: flex;
-	flex-direction: column;
-	gap: var(--space-sm);
-	align-items: center;
-	text-align: center;
-}
-
-.academic-announcement__legal,
-.academic-announcement__contact {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	justify-content: center;
-	gap: var(--space-md);
-}
-
-.academic-announcement__badge {
-	color: var(--color-gold-light);
-	display: inline-flex;
-	align-items: center;
-	gap: var(--space-xs);
-	font-weight: 600;
-}
-
-.academic-announcement__whatsapp {
-	font-weight: 700;
-	color: #ffffff;
-	display: inline-flex;
-	align-items: center;
-	gap: var(--space-xs);
-}
-
-.academic-announcement__whatsapp:hover {
-	color: var(--color-gold-light);
-}
-
+/* Header ----------------------------------------------------------------- */
 .academic-header {
 	position: sticky;
 	top: 0;
