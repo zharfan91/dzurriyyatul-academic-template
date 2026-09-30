@@ -22,9 +22,12 @@
 	border-radius: var(--radius-full);
 }
 
+/* Mobile-first: compact on phones (~46px tall, still a comfortable tap
+   target), a little larger on tablets, full size above 1024px — see the
+   640px and 1025px blocks in responsive.css. */
 .academic-btn--lg {
-	padding: 1rem 2rem;
-	font-size: var(--text-body-lg-size);
+	padding: 0.75rem 1.375rem;
+	font-size: 0.9375rem;
 }
 
 .academic-btn--sm {

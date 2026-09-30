@@ -261,8 +261,9 @@
 
 .academic-hero__actions {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	flex-wrap: wrap;
+	align-items: center;
 	gap: var(--space-md);
 	margin-top: var(--space-sm);
 }
