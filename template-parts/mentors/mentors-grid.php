@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $mentors_query = new WP_Query( array(
 	'post_type'      => 'mentor',
 	'post_status'    => 'publish',
-	'posts_per_page' => 8,
+	'posts_per_page' => -1, // Every published mentor; order via Kelola Konten.
 	'orderby'        => 'menu_order',
 	'order'          => 'ASC',
 	'no_found_rows'  => true,

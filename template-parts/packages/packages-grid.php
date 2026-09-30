@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $packages_query = new WP_Query( array(
 	'post_type'      => 'package',
 	'post_status'    => 'publish',
-	'posts_per_page' => 6,
+	'posts_per_page' => -1, // Every published package; order via Kelola Konten.
 	'orderby'        => 'menu_order',
 	'order'          => 'ASC',
 	'no_found_rows'  => true,

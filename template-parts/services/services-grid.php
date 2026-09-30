@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $services_query = new WP_Query( array(
 	'post_type'      => 'service',
 	'post_status'    => 'publish',
-	'posts_per_page' => 9,
+	'posts_per_page' => -1, // Every published service; order via Kelola Konten.
 	'orderby'        => 'menu_order',
 	'order'          => 'ASC',
 	'no_found_rows'  => true,
