@@ -12,15 +12,19 @@
 
 /* ================= HERO ================= */
 /* Editorial 3-slide hero (template-parts/hero/hero-carousel.php). Mobile:
-   text then image, stacked. Desktop (responsive.css, >=1024px): 50/50, the
-   image absolutely fills the right half of the slide and bleeds to the
-   viewport edge. */
+   text then image, stacked. Desktop (responsive.css, >=1024px): a true
+   50/50 split of the viewport — text from the left gutter to the midpoint,
+   image filling the right half edge-to-edge. The hero's rows reuse
+   .academic-container for markup only; its centered 1280px box
+   (margin-inline: auto) is switched off here and --hero-gutter sets the
+   side spacing instead. */
 .academic-hero {
+	--hero-gutter: var(--margin-mobile);
 	position: relative;
 	overflow: hidden;
 	background: linear-gradient(to bottom, #fafaf9 0%, rgba(209, 250, 229, 0.2) 45%, var(--color-ivory) 100%);
 	display: grid;
-	grid-template-columns: 1fr min(var(--container-max), 100%) 1fr;
+	grid-template-columns: minmax(0, 1fr);
 }
 
 .academic-hero__clip-defs {
@@ -158,13 +162,16 @@
    the slide effect off for everyone. */
 
 /* --- Text column ---------------------------------------------------------*/
-/* width: 100% — inside the flex-column slide, .academic-container's
-   margin-inline: auto would otherwise shrink this to its content width. */
-.academic-hero__grid {
+/* Doubled class for specificity over .academic-container's breakpoint
+   padding in responsive.css. */
+.academic-hero .academic-hero__grid {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
 	align-items: center;
 	width: 100%;
+	max-width: none;
+	margin-inline: unset;
+	padding-inline: var(--hero-gutter);
 }
 
 .academic-hero__content {
@@ -255,6 +262,7 @@
 .academic-hero__actions {
 	display: flex;
 	flex-direction: column;
+	flex-wrap: wrap;
 	gap: var(--space-md);
 	margin-top: var(--space-sm);
 }
@@ -267,7 +275,7 @@
 .academic-hero__fallback-inner {
 	position: relative;
 	z-index: 10;
-	grid-column: 2 / 3;
+	grid-column: 1 / -1;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -284,7 +292,7 @@
 /* --- Image column ----------------------------------------------------------*/
 .academic-hero__visual {
 	position: relative;
-	padding-inline: var(--margin-mobile);
+	padding-inline: var(--hero-gutter);
 	padding-bottom: var(--space-md);
 }
 
@@ -329,14 +337,15 @@
 /* --- Footer: indicator + previous/next ------------------------------------*/
 /* Overlaid on the bottom of the active slide: same grid cell as the stage,
    pinned to its bottom edge. The empty middle stays click-through. */
-.academic-hero__footer {
+.academic-hero .academic-hero__footer {
 	position: relative;
 	z-index: 5;
 	grid-row: 1;
-	grid-column: 2 / 3;
+	grid-column: 1 / -1;
 	align-self: end;
 	max-width: none;
-	margin-inline: 0;
+	margin-inline: unset;
+	padding-inline: var(--hero-gutter);
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

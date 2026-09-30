@@ -82,9 +82,8 @@
 		padding-bottom: 0;
 	}
 
-	.academic-hero__footer {
-		padding-top: 0;
-		padding-bottom: var(--space-lg);
+	.academic-hero {
+		--hero-gutter: var(--margin-tablet);
 	}
 
 	.academic-services__header {
@@ -137,12 +136,32 @@
 	}
 }
 
-/* --- 1024px (lg) ----------------------------------------------------------*/
-@media (min-width: 1024px) {
-	/* Editorial 50/50: text in the container's left half, image filling the
-	   slide's right half edge-to-edge (top, bottom and right). */
-	.academic-hero--editorial .academic-hero__slide {
-		min-height: clamp(540px, 68vh, 620px);
+/* --- Hero: fixed-height editorial composition ------------------------------
+   Heights per design: 659px above 1024px, 600px from 769px to 1024px, and
+   auto (at least 680px) at 768px and below, where the hero stacks. The
+   50/50 side-by-side layout therefore starts at 769px (not 1024px), so the
+   600px band never has to hold the tall stacked layout. */
+.academic-hero--editorial {
+	height: auto;
+	min-height: 680px;
+}
+
+@media (min-width: 769px) {
+	.academic-hero--editorial {
+		--hero-gutter: clamp(24px, 6vw, 120px);
+		height: 600px;
+		min-height: 0;
+	}
+
+	/* The stage and the active slide fill the fixed height; inactive
+	   slides stay absolutely stacked on top (sections.css). */
+	.academic-hero--editorial .academic-hero__stage {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.academic-hero--editorial .academic-hero__slide.is-active {
+		flex: 1 1 auto;
 	}
 
 	.academic-hero--editorial .academic-hero__grid {
@@ -153,9 +172,32 @@
 
 	.academic-hero--editorial .academic-hero__content {
 		grid-column: 1;
-		/* Extra bottom room so the overlaid footer never covers the CTAs. */
-		padding-block: var(--space-2xl) calc(var(--space-2xl) + 40px);
-		padding-right: var(--space-xl);
+		max-width: clamp(560px, 42vw, 780px);
+		gap: 12px;
+		padding-block: var(--space-lg);
+		padding-right: var(--space-lg);
+	}
+
+	/* 769-1024px: the text column is too narrow for both large buttons on
+	   one row, so they wrap and shrink a little, and the indicator moves to
+	   the right next to the arrows (over the image) to leave the whole
+	   text column free. From 1025px it returns under the text. */
+	.academic-hero--editorial .academic-hero__actions {
+		gap: 10px;
+	}
+
+	.academic-hero--editorial .academic-hero__actions .academic-btn {
+		padding: 0.75rem 1.25rem;
+		font-size: 0.9375rem;
+	}
+
+	.academic-hero--editorial .academic-hero__footer {
+		justify-content: flex-end;
+		gap: var(--space-sm);
+	}
+
+	.academic-hero--editorial .academic-hero__arrows {
+		margin-left: 0;
 	}
 
 	.academic-hero--editorial .academic-hero__visual {
@@ -177,11 +219,57 @@
 		border-radius: 0;
 	}
 
-	.academic-hero__heading {
-		font-size: var(--text-display-lg-size);
-		line-height: var(--text-display-lg-line);
+	/* Text scales with the viewport so the left half stays balanced against
+	   the full-height image (28px at 769, 32px at 1024, ~43px at 1440,
+	   capped at 60px), keeping "DZURRIYYATUL QUR'AN" on one line on desktop. */
+	.academic-hero--editorial .academic-hero__heading {
+		font-size: clamp(1.75rem, 3vw, 3.75rem);
+		line-height: 1.12;
 	}
 
+	.academic-hero--editorial .academic-hero__tagline {
+		font-size: clamp(1.125rem, 1.45vw, 1.75rem);
+	}
+
+	.academic-hero--editorial .academic-hero__description {
+		font-size: clamp(0.9375rem, 1.05vw, 1.25rem);
+		line-height: 1.6;
+		max-width: 38em;
+	}
+}
+
+@media (min-width: 1025px) {
+	.academic-hero--editorial {
+		height: 659px;
+	}
+
+	.academic-hero--editorial .academic-hero__content {
+		gap: var(--space-md);
+		/* Bottom room so the overlaid indicator never covers the CTAs. */
+		padding-block: var(--space-xl) calc(var(--space-xl) + 48px);
+		padding-right: var(--space-xl);
+	}
+
+	.academic-hero--editorial .academic-hero__actions {
+		gap: var(--space-md);
+	}
+
+	.academic-hero--editorial .academic-hero__actions .academic-btn {
+		padding: 1rem 2rem;
+		font-size: var(--text-body-lg-size);
+	}
+
+	.academic-hero--editorial .academic-hero__footer {
+		justify-content: space-between;
+	}
+
+	.academic-hero--editorial .academic-hero__arrows {
+		margin-left: auto;
+	}
+}
+
+/* --- 1024px (lg) ----------------------------------------------------------*/
+@media (min-width: 1024px) {
 	.academic-pillars__grid {
 		grid-template-columns: repeat(5, 1fr);
 	}
